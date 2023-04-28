@@ -115,6 +115,7 @@ function LeaveRequests() {
                                     value={type}
                                     onChange={(e) => setType(e.target.value)}
                                     label="نوع مرخصی"
+                                    autoFocus
                                 >
                                     <MenuItem value={0}>همه</MenuItem>
                                     <MenuItem value={1}>استحقاقی</MenuItem>
@@ -159,8 +160,7 @@ function LeaveRequests() {
                                 label='نام پرسنل'
                                 id='employeeNameSearch'
                                 name='employeeNameSearch'
-                                autoComplete
-                                autoFocus
+                                autoComplete='name'
                                 onChange={(e) => setEmployeeNameSearch(e.target.value)}>
                             </TextField>
                         </Box>
