@@ -35,9 +35,6 @@ function Login() {
             }
         }
 
-        // handle successful registration here
-
-
     }
 
     return (
@@ -63,6 +60,7 @@ function Login() {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={email}
                         onChange={(e) => {
                             setEmail(e.target.value)
                         }}
@@ -76,6 +74,7 @@ function Login() {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        value={password}
                         onChange={(e) => {
                             setPassword(e.target.value)
                         }}
