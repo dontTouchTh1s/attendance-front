@@ -9,6 +9,7 @@ import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import Login from "./Login";
 import SingUp from "./SingUp";
+import LeaveRequests from "./leaveReqests/LeaveRequests";
 
 const router = createBrowserRouter([
     {
@@ -24,8 +25,13 @@ const router = createBrowserRouter([
                 path: "/sing-up",
                 element: <SingUp/>,
             }
-        ]
+        ],
+        
     },
+    {
+        path: "leave-requests",
+        element: <LeaveRequests/>,
+    }
 
 ]);
 
