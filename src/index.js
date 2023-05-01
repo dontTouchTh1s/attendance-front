@@ -5,16 +5,18 @@ import reportWebVitals from './reportWebVitals';
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import Root from "./routes/root";
 import ErrorPage from "./error-page";
 import Login from "./Login";
 import SingUp from "./SingUp";
 import LeaveRequests from "./leaveReqests/LeaveRequests";
+import App from "./App";
+import "./Api"
+
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <Root/>,
+        element: <App/>,
         errorElement: <ErrorPage/>,
         children: [
             {
@@ -24,13 +26,13 @@ const router = createBrowserRouter([
             {
                 path: "/sing-up",
                 element: <SingUp/>,
+            },
+            {
+                path: "leave-requests",
+                element: <LeaveRequests/>,
             }
         ],
-        
-    },
-    {
-        path: "leave-requests",
-        element: <LeaveRequests/>,
+
     }
 
 ]);

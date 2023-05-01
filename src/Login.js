@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
-import axios from "axios";
+import Api from "./Api";
 
 
 function Login() {
@@ -16,10 +16,8 @@ function Login() {
         formData.append("password", password);
 
 
-        axios.defaults.withCredentials = true;
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie');
         try {
-            const response = await axios.post('http://localhost:8000/api/login', formData);
+            const response = await Api.post('/login', formData);
             // handle successful response
             console.log(response);
         } catch (error) {

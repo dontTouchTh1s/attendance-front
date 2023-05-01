@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
-import axios from "axios";
+import Api from "./Api";
 
 
 function SingUp() {
@@ -20,10 +20,9 @@ function SingUp() {
         formData.append("email", email);
         formData.append("password", password);
 
-        axios.defaults.withCredentials = true;
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie');
         try {
-            const response = await axios.post('http://localhost:8000/api/register', formData);
+            const response = Api.post('/register', formData);
+            console.log(response)
             // handle successful response
         } catch (error) {
             if (error.response) {
