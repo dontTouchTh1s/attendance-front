@@ -8,7 +8,7 @@ import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./error-page";
 import Login from "./Pages/Auth/Login";
 import SingUp from "./Pages/Auth/SingUp";
-import LeaveRequests from "./Pages/leaveReqests/LeaveRequests";
+import LeaveRequests from "./Pages/LeaveReqests/LeaveRequests";
 import App from "./App";
 import "./Api"
 import CreateRequest from "./Pages/CreateRquest/CreateRequest";

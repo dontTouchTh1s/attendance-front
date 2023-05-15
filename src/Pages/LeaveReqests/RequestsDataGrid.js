@@ -1,8 +1,8 @@
 import {DataGridPro, GridApi, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useEffect, useState} from "react";
 import {Box, Button, Modal, ThemeProvider} from "@mui/material";
-import {theme} from '../../theme/rtl-theme'
-import RTL from "../../theme/RTL";
+import {theme} from '../../Theme/rtl-theme'
+import RTL from "../../Theme/RTL";
 
 const style = {
     position: 'absolute',
