@@ -1,10 +1,8 @@
-import {DataGridPro, GridApi, GridColDef, GridLogicOperator, GridRowProps} from "@mui/x-data-grid-pro";
+import {DataGridPro, GridApi, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useEffect, useState} from "react";
 import {Box, Button, Modal, ThemeProvider} from "@mui/material";
-import {GridFilterModel} from "@mui/x-data-grid";
-import {theme} from '../theme/rtl-theme'
-import RTL from "../theme/RTL";
-import {GridCellParams} from "@mui/x-data-grid-pro";
+import {theme} from '../../theme/rtl-theme'
+import RTL from "../../theme/RTL";
 
 const style = {
     position: 'absolute',
@@ -20,14 +18,6 @@ const style = {
     pb: 3,
 };
 
-const rows: GridRowProps = [
-    {id: 1, name: 'علی مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-    {id: 2, name: 'رضا مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-    {id: 3, name: 'محمود مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-
-];
-
-
 const columns: GridColDef = [
     {
         field: 'id', type: 'number', headerName: 'ردیف', headerAlign: 'left',
@@ -35,7 +25,16 @@ const columns: GridColDef = [
     },
     {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
     {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
-    {field: 'date', type: 'date', headerName: 'تاریخ', headerAlign: 'left', minWidth: 120},
+    {
+        field: 'date',
+        type: 'date',
+        headerName: 'تاریخ',
+        headerAlign: 'left',
+        minWidth: 120,
+        valueGetter: (params) => {
+            return new Date(params.value);
+        },
+    },
     {
         field: "action",
         headerName: "عملیات",
@@ -71,14 +70,13 @@ const columns: GridColDef = [
 ];
 
 
-function RequestsDataGrid({onSelectedRowsChanged, filters}) {
+function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
     useEffect(() => {
-
-
         let type;
         // eslint-disable-next-line default-case
+        // Convert type to persian text
         switch (filters.type) {
             case 0:
                 type = 'همه';
@@ -117,7 +115,6 @@ function RequestsDataGrid({onSelectedRowsChanged, filters}) {
                 value: filters.toDate.locale('en_US').format('YYYY-MM-DD')
             });
         }
-        console.log(newFilterModel);
         setFilterModel(newFilterModel);
     }, [filters.fromDate, filters.group, filters.name, filters.toDate, filters.type]);
 
@@ -125,18 +122,19 @@ function RequestsDataGrid({onSelectedRowsChanged, filters}) {
     return (
         <ThemeProvider theme={theme}>
             <RTL>
-                <DataGridPro rows={rows}
-                             columns={columns}
-                             checkboxSelection
-                             filterModel={filterModel}
-                             onFilterModelChange={(model) => {
-                                 setFilterModel(model)
-                                 console.log(model)
-                             }}
-                             disableRowSelectionOnClick
-                             sx={{}}
-                             onRowSelectionModelChange={onSelectedRowsChanged}
-                             onRowClick={() => setModalInfoOpen(true)}
+                <DataGridPro
+                    {...data}
+                    columns={columns}
+                    checkboxSelection
+                    filterModel={filterModel}
+                    onFilterModelChange={(model) => {
+                        setFilterModel(model)
+                        console.log(model)
+                    }}
+                    disableRowSelectionOnClick
+                    sx={{}}
+                    onRowSelectionModelChange={onSelectedRowsChanged}
+                    onRowClick={() => setModalInfoOpen(true)}
                 >
                 </DataGridPro>
                 <Modal

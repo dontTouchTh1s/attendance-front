@@ -12,10 +12,8 @@ import {
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterMomentJalaali} from '@mui/x-date-pickers/AdapterMomentJalaali';
 import moment from 'moment-jalaali';
-import React, {useState} from 'react';
-import RTL from "../theme/RTL";
-import {theme} from "../theme/rtl-theme";
-import Api from "../Api";
+import React, {useEffect, useState} from 'react';
+import Api from "../../Api";
 import RequestsDataGrid from "./RequestsDataGrid";
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
@@ -29,18 +27,46 @@ function LeaveRequests() {
         type: 0,
         group: 0
     });
+    const [data, setData] = useState({rows: []});
     const [selectedRows, setSelectedRows] = useState([]);
+    useEffect(() => {
+        fetchRequests();
+    }, [])
 
     function handleSelectedRowsChanged(value) {
         setSelectedRows(value);
+        console.log(data);
+
     }
 
     function handleSearch() {
 
     }
 
-    //function acceptRequest() {
-    //}
+    async function fetchRequests() {
+        try {
+            const response = await Api.get('/requests');
+            // handle successful response
+            let data = response.data.data;
+            setData({
+                rows: data
+            });
+
+        } catch (error) {
+            if (error.response) {
+                // handle error response
+                console.log(error.response.data);
+            } else if (error.request) {
+                // handle no response
+                console.log(error.request);
+            } else {
+                // handle other errors
+                console.log('Error', error.message);
+            }
+
+        }
+    }
+
     async function handleLogOut() {
         try {
             const response = await Api.post('/logout');
@@ -114,7 +140,6 @@ function LeaveRequests() {
                         value={filter.toDate}
                         onChange={(newValue) => setFilter({...filter, toDate: newValue})}
                         fullWidth
-                        margin="normal"
                         label="تا تاریخ"
                         name="from_date"
                         id="from_date">
@@ -133,7 +158,10 @@ function LeaveRequests() {
                     >جست و جو</Button>
                 </Box>
                 <Box sx={{marginTop: '8px'}}>
-                    <RequestsDataGrid onSelectedRowsChanged={handleSelectedRowsChanged} filters={filter}>
+                    <RequestsDataGrid onSelectedRowsChanged={handleSelectedRowsChanged}
+                                      filters={filter}
+                                      data={data}
+                    >
 
                     </RequestsDataGrid>
                 </Box>
