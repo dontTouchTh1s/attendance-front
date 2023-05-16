@@ -1,25 +1,29 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
-import Api from "./Api";
+import Api from "../../Api";
 
 
-function Login() {
+function SingUp() {
+
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [cPassword, setCPassword] = useState('');
 
 
     async function handleSubmit(e) {
         e.preventDefault();
-
+        if (password !== cPassword)
+            return;
         let formData = new FormData();
+        formData.append("name", name);
         formData.append("email", email);
         formData.append("password", password);
 
-
         try {
-            const response = await Api.post('/login', formData);
+            const response = Api.post('/register', formData);
+            console.log(response)
             // handle successful response
-            console.log(response);
         } catch (error) {
             if (error.response) {
                 // handle error response
@@ -32,6 +36,8 @@ function Login() {
                 console.log('Error', error.message);
             }
         }
+
+        // handle successful registration here
 
     }
 
@@ -49,6 +55,20 @@ function Login() {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate>
                     <TextField
+                        type="name"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="name"
+                        label="نام"
+                        name="نام"
+                        autoComplete="name"
+                        autoFocus
+                        onChange={(e) => {
+                            setName(e.target.value)
+                        }}
+                    />
+                    <TextField
                         type="email"
                         margin="normal"
                         required
@@ -58,7 +78,6 @@ function Login() {
                         name="email"
                         autoComplete="email"
                         autoFocus
-                        value={email}
                         onChange={(e) => {
                             setEmail(e.target.value)
                         }}
@@ -71,10 +90,22 @@ function Login() {
                         label="رمز عبود"
                         type="password"
                         id="password"
-                        autoComplete="current-password"
-                        value={password}
+                        autoComplete="new-password"
                         onChange={(e) => {
                             setPassword(e.target.value)
+                        }}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="cPassword"
+                        label="تکرار رمز عبور"
+                        type="text"
+                        id="cPassword"
+                        autoComplete="new-password"
+                        onChange={(e) => {
+                            setCPassword(e.target.value)
                         }}
                     />
                     <Button
@@ -90,4 +121,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SingUp;

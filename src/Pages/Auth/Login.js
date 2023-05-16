@@ -1,29 +1,25 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
-import Api from "./Api";
+import Api from "../../Api";
 
 
-function SingUp() {
-
-    const [name, setName] = useState('');
+function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [cPassword, setCPassword] = useState('');
 
 
     async function handleSubmit(e) {
         e.preventDefault();
-        if (password !== cPassword)
-            return;
+
         let formData = new FormData();
-        formData.append("name", name);
         formData.append("email", email);
         formData.append("password", password);
 
+
         try {
-            const response = Api.post('/register', formData);
-            console.log(response)
+            const response = await Api.post('/login', formData);
             // handle successful response
+            console.log(response);
         } catch (error) {
             if (error.response) {
                 // handle error response
@@ -36,8 +32,6 @@ function SingUp() {
                 console.log('Error', error.message);
             }
         }
-
-        // handle successful registration here
 
     }
 
@@ -55,20 +49,6 @@ function SingUp() {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate>
                     <TextField
-                        type="name"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="name"
-                        label="نام"
-                        name="نام"
-                        autoComplete="name"
-                        autoFocus
-                        onChange={(e) => {
-                            setName(e.target.value)
-                        }}
-                    />
-                    <TextField
                         type="email"
                         margin="normal"
                         required
@@ -78,6 +58,7 @@ function SingUp() {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        value={email}
                         onChange={(e) => {
                             setEmail(e.target.value)
                         }}
@@ -90,22 +71,10 @@ function SingUp() {
                         label="رمز عبود"
                         type="password"
                         id="password"
-                        autoComplete="new-password"
+                        autoComplete="current-password"
+                        value={password}
                         onChange={(e) => {
                             setPassword(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="cPassword"
-                        label="تکرار رمز عبور"
-                        type="text"
-                        id="cPassword"
-                        autoComplete="new-password"
-                        onChange={(e) => {
-                            setCPassword(e.target.value)
                         }}
                     />
                     <Button
@@ -121,4 +90,4 @@ function SingUp() {
     );
 }
 
-export default SingUp;
+export default Login;

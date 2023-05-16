@@ -6,11 +6,13 @@ import reportWebVitals from './reportWebVitals';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import ErrorPage from "./error-page";
-import Login from "./Login";
-import SingUp from "./SingUp";
-import LeaveRequests from "./leaveReqests/LeaveRequests";
+import Login from "./Pages/Auth/Login";
+import SingUp from "./Pages/Auth/SingUp";
+import LeaveRequests from "./Pages/LeaveReqests/LeaveRequests";
 import App from "./App";
 import "./Api"
+import CreateRequest from "./Pages/CreateRquest/CreateRequest";
+import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 
 
 const router = createBrowserRouter([
@@ -28,9 +30,13 @@ const router = createBrowserRouter([
                 element: <SingUp/>,
             },
             {
-                path: "leave-requests",
+                path: "/leave-requests",
                 element: <LeaveRequests/>,
-            }
+            },
+            {
+                path: "/create-leave-request",
+                element: <CreateLeaveRequest/>,
+            },
         ],
 
     }

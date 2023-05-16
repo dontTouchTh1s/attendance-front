@@ -1,10 +1,10 @@
-import {DataGridPro, GridApi, GridColDef, GridLogicOperator, GridRowProps} from "@mui/x-data-grid-pro";
+import {DataGridPro, GridApi, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useEffect, useState} from "react";
 import {Box, Button, Modal, ThemeProvider} from "@mui/material";
-import {GridFilterModel} from "@mui/x-data-grid";
-import {theme} from '../theme/rtl-theme'
-import RTL from "../theme/RTL";
-import {GridCellParams} from "@mui/x-data-grid-pro";
+import {theme} from '../../Theme/rtl-theme'
+import RTL from "../../Theme/RTL";
+import moment from "moment-jalaali";
+
 
 const style = {
     position: 'absolute',
@@ -20,14 +20,6 @@ const style = {
     pb: 3,
 };
 
-const rows: GridRowProps = [
-    {id: 1, name: 'علی مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-    {id: 2, name: 'رضا مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-    {id: 3, name: 'محمود مشایخی', type: 'استحقاقی', date: new Date('4/24/2023')},
-
-];
-
-
 const columns: GridColDef = [
     {
         field: 'id', type: 'number', headerName: 'ردیف', headerAlign: 'left',
@@ -35,7 +27,24 @@ const columns: GridColDef = [
     },
     {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
     {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
-    {field: 'date', type: 'date', headerName: 'تاریخ', headerAlign: 'left', minWidth: 120},
+    {
+        field: 'date',
+        type: 'date',
+        headerName: 'تاریخ',
+        headerAlign: 'left',
+        minWidth: 120,
+        valueGetter: (params) => {
+            return new Date(params.value);
+        },
+        valueFormatter: (params) => {
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+            let date = moment(params.value)
+                .format("jYYYY-jMM-jDD");
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+            return date;
+
+        },
+    },
     {
         field: "action",
         headerName: "عملیات",
@@ -71,13 +80,12 @@ const columns: GridColDef = [
 ];
 
 
-function RequestsDataGrid({onSelectedRowsChanged, filters}) {
+function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
     useEffect(() => {
-
-
         let type;
+        // Convert type to persian text
         // eslint-disable-next-line default-case
         switch (filters.type) {
             case 0:
@@ -105,38 +113,37 @@ function RequestsDataGrid({onSelectedRowsChanged, filters}) {
             newFilterModel.items.push({id: 2, field: 'name', operator: 'contains', value: filters.name});
         }
 
-        if (filters.fromDate !== null) {
+        if (filters.createDate[0] !== null && filters.createDate[1] !== null) {
             newFilterModel.items.push({
                 id: 3, field: 'date', operator: 'onOrAfter',
-                value: filters.fromDate.locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[0].locale('en_US').format('YYYY-MM-DD')
             });
-        }
-        if (filters.toDate !== null) {
             newFilterModel.items.push({
                 id: 4, field: 'date', operator: 'onOrBefore',
-                value: filters.toDate.locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[1].locale('en_US').format('YYYY-MM-DD')
             });
         }
-        console.log(newFilterModel);
+
         setFilterModel(newFilterModel);
-    }, [filters.fromDate, filters.group, filters.name, filters.toDate, filters.type]);
+    }, [filters.createDate, filters.group, filters.name, filters.toDate, filters.type]);
 
 
     return (
         <ThemeProvider theme={theme}>
             <RTL>
-                <DataGridPro rows={rows}
-                             columns={columns}
-                             checkboxSelection
-                             filterModel={filterModel}
-                             onFilterModelChange={(model) => {
-                                 setFilterModel(model)
-                                 console.log(model)
-                             }}
-                             disableRowSelectionOnClick
-                             sx={{}}
-                             onRowSelectionModelChange={onSelectedRowsChanged}
-                             onRowClick={() => setModalInfoOpen(true)}
+                <DataGridPro
+                    {...data}
+                    columns={columns}
+                    checkboxSelection
+                    filterModel={filterModel}
+                    onFilterModelChange={(model) => {
+                        setFilterModel(model)
+                        console.log(model)
+                    }}
+                    disableRowSelectionOnClick
+                    sx={{}}
+                    onRowSelectionModelChange={onSelectedRowsChanged}
+                    onRowClick={() => setModalInfoOpen(true)}
                 >
                 </DataGridPro>
                 <Modal
