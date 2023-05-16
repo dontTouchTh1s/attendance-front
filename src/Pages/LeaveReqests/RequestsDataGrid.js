@@ -3,6 +3,8 @@ import React, {useEffect, useState} from "react";
 import {Box, Button, Modal, ThemeProvider} from "@mui/material";
 import {theme} from '../../Theme/rtl-theme'
 import RTL from "../../Theme/RTL";
+import moment from "moment-jalaali";
+
 
 const style = {
     position: 'absolute',
@@ -33,6 +35,14 @@ const columns: GridColDef = [
         minWidth: 120,
         valueGetter: (params) => {
             return new Date(params.value);
+        },
+        valueFormatter: (params) => {
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+            let date = moment(params.value)
+                .format("jYYYY-jMM-jDD");
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+            return date;
+
         },
     },
     {
@@ -75,8 +85,8 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
     const [filterModel, setFilterModel] = useState({items: []});
     useEffect(() => {
         let type;
-        // eslint-disable-next-line default-case
         // Convert type to persian text
+        // eslint-disable-next-line default-case
         switch (filters.type) {
             case 0:
                 type = 'همه';
@@ -103,20 +113,19 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
             newFilterModel.items.push({id: 2, field: 'name', operator: 'contains', value: filters.name});
         }
 
-        if (filters.fromDate !== null) {
+        if (filters.createDate[0] !== null && filters.createDate[1] !== null) {
             newFilterModel.items.push({
                 id: 3, field: 'date', operator: 'onOrAfter',
-                value: filters.fromDate.locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[0].locale('en_US').format('YYYY-MM-DD')
             });
-        }
-        if (filters.toDate !== null) {
             newFilterModel.items.push({
                 id: 4, field: 'date', operator: 'onOrBefore',
-                value: filters.toDate.locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[1].locale('en_US').format('YYYY-MM-DD')
             });
         }
+
         setFilterModel(newFilterModel);
-    }, [filters.fromDate, filters.group, filters.name, filters.toDate, filters.type]);
+    }, [filters.createDate, filters.group, filters.name, filters.toDate, filters.type]);
 
 
     return (
