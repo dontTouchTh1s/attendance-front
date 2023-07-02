@@ -48,7 +48,8 @@ function LeaveRequests() {
             setData({
                 rows: data
             });
-            console.log('yo yo who got u smile like that?')
+            console.log(data);
+
 
         } catch (error) {
             if (error.response) {
@@ -61,7 +62,6 @@ function LeaveRequests() {
                 // handle other errors
                 console.log('Error', error.message);
             }
-
         }
     }
 
