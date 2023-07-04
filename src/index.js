@@ -12,6 +12,7 @@ import LeaveRequests from "./Pages/LeaveReqests/LeaveRequests";
 import App from "./App";
 import "./Api"
 import CreateRequest from "./Pages/CreateRquest/CreateRequest";
+import GoogleMap from "./Map/GoogleMap"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 
 
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
             {
                 path: "/create-leave-request",
                 element: <CreateLeaveRequest/>,
+            },
+            {
+                path: "/location",
+                element: <GoogleMap/>,
             },
         ],
 

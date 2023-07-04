@@ -25,6 +25,7 @@ function App() {
                     <p><Link to={'/sing-up'}>sing up</Link></p>
                     <p><Link to={'/leave-requests'}>leave requests</Link></p>
                     <p><Link to={'/create-leave-request'}>create leave request</Link></p>
+                    <p><Link to={'/location'}>location</Link></p>
 
                 </div>
                 <Outlet>
