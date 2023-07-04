@@ -28,7 +28,7 @@ const columns: GridColDef = [
     {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
     {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
     {
-        field: 'create-date',
+        field: 'createDate',
         type: 'date',
         headerName: 'تاریخ ثبت',
         headerAlign: 'left',
@@ -48,9 +48,29 @@ const columns: GridColDef = [
         },
     },
     {
-        field: 'leave-date-range',
+        field: 'leaveFromDate',
         type: 'date',
-        headerName: 'بازه مرخصی',
+        headerName: 'مرخصی از تاریخ',
+        headerAlign: 'left',
+        minWidth: 120,
+        valueGetter: (params) => {
+            console.log(params.value);
+
+            return new Date(params.value);
+        },
+        valueFormatter: (params) => {
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+            let date = moment(params.value)
+                .format("jYYYY-jMM-jDD");
+            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+            return date;
+
+        },
+    },
+    {
+        field: 'leaveToDate',
+        type: 'date',
+        headerName: 'مرخصی تا تاریخ',
         headerAlign: 'left',
         minWidth: 120,
         valueGetter: (params) => {
