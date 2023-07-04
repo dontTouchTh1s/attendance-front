@@ -15,6 +15,7 @@ import Api from "../../Api";
 import {LocalizationProvider, TimePicker} from '@mui/x-date-pickers-pro';
 import {DateRangePicker} from '@mui/x-date-pickers-pro/DateRangePicker';
 import {AdapterMomentJalaali} from '@mui/x-date-pickers-pro/AdapterMomentJalaali';
+import dayjs from "dayjs";
 import './create-request.css';
 import {DatePicker} from "@mui/x-date-pickers-pro";
 import moment from "moment-jalaali";
@@ -25,16 +26,12 @@ function CreateLeaveRequest() {
         moment(),
         moment().add(1, 'days'),
     ]);
-    const [hourRange, setHourRange] = useState([
-        moment(),
-        moment()
-    ]);
+    //
+    const [fromHour, setFromHour] = useState(dayjs('2022-04-17T15:30'));
+    const [toHour, setToHour] = useState(dayjs('2022-04-17T15:30'));
     const [description, setDescription] = useState('');
     const [leaveTimingType, setLeaveTimingType] = useState('');
 
-    function convertDate(date: Array, format: string) {
-        return date.map((date) => date.format(format))
-    }
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -42,14 +39,15 @@ function CreateLeaveRequest() {
         let formData = new FormData();
         formData.append('type', 'leave');
         formData.append('leave_type', type);
-        formData.append('dates', JSON.stringify(convertDate(dateRange, 'YYYY:MM:DD')));
+        formData.append('from_date', dateRange[0].getDate());
+        formData.append('to_date', dateRange[1].getDate());
         formData.append('description', description);
-        if (leaveTimingType === 'hourly') {
-            formData.append('hours', JSON.stringify(convertDate(hourRange, 'HH:mm')));
+        if (leaveTimingType === 1) {
+            formData.append('from_hour', (dateRange[0].format('YYYY-MM-DD')));
+            formData.append('to_hour', (dateRange[1].format('YYYY-MM-DD')));
         }
-        for (const value of formData.values()) {
-            console.log(value)
-        }
+        for (const value of formData.values())
+            console.log(value);
 
 
         try {
@@ -71,19 +69,12 @@ function CreateLeaveRequest() {
 
     }
 
-    // console.log(hourRange)
     let hourPickerDisplay = leaveTimingType === 'hourly' ? '' : 'hidden';
     let dateRangePicker = leaveTimingType === 'daily' ? '' : 'hidden';
 
-    function handleUpdateHourRange(newValue, index) {
-        let newHourRange = hourRange.map((hour) => {
-            let currentValueIndex = hourRange.indexOf(hour);
-            if (currentValueIndex === index) {
-                return newValue;
-            }
-            return hour;
-        });
-        setHourRange(newHourRange);
+    function handleDateRangeChange(dateRage) {
+        dateRage.map(date => date.getDay);
+        setDateRange(dateRage)
     }
 
     return (
@@ -149,7 +140,7 @@ function CreateLeaveRequest() {
                                          }}>
                                 <DatePicker
                                     value={dateRange[0]}
-                                    onChange={(newValue) => setDateRange([newValue])}
+                                    onChange={(newValue) => setDateRange([newValue, newValue])}
                                     fullWidth
                                     label="تاریخ"
                                     name="date"
@@ -157,23 +148,20 @@ function CreateLeaveRequest() {
                                 </DatePicker>
                                 <TimePicker
                                     label="از ساعت"
-                                    value={hourRange[0]}
-                                    maxTime={hourRange[1]}
-
-                                    onChange={(newValue) => handleUpdateHourRange(newValue, 0)}
+                                    value={fromHour}
+                                    onChange={(newValue) => setFromHour(newValue)}
                                 />
                                 <TimePicker
                                     label="تا ساعت"
-                                    value={hourRange[1]}
-                                    minTime={hourRange[0]}
-                                    onChange={(newValue) => handleUpdateHourRange(newValue, 1)}
+                                    value={toHour}
+                                    onChange={(newValue) => setToHour(newValue)}
                                 />
                             </FormControl>
                             <DateRangePicker
                                 className={dateRangePicker + " form-control"}
                                 localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
                                 value={dateRange}
-                                onChange={(newValue) => setDateRange(newValue)}
+                                onChange={handleDateRangeChange}
                             />
 
                             <TextField
