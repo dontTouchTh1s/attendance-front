@@ -1,10 +1,12 @@
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-function LocationPin(){
-    return(
-        <div className="pin">
-            <LocationOnIcon />
-            <p className="pin-text">test</p>
+
+function LocationPin({text, onSelectLocation}) {
+    return (
+        <div onClick={onSelectLocation} className="pin">
+            <LocationOnIcon/>
+            <p className="pin-text">{text}</p>
         </div>
     );
 }
+
 export default LocationPin
