@@ -3,7 +3,7 @@ import MapPicker from 'react-google-map-picker'
 import './map.css';
 import LocationPin from './LocationPin';
 
-function GoogleMap() {
+function GoogleMap({onChangeLocation}) {
     const DefaultLocation = {lat: 10, lng: 106};
     const DefaultZoom = 10;
     const [defaultLocation, setDefaultLocation] = useState(DefaultLocation);
@@ -26,19 +26,19 @@ function GoogleMap() {
 
     return (
         <>
-            <button onClick={handleResetLocation}>Reset Location</button>
-            <label>Latitute:</label><input type='text' value={location.lat} disabled/>
-            <label>Longitute:</label><input type='text' value={location.lng} disabled/>
-            <label>Zoom:</label><input type='text' value={zoom} disabled/>
+            <div className="map">
+
             <MapPicker
+                className={'google-map'}
                 zoom={zoom}
                 mapTypeId="roadmap"
                 style={{height: '700px'}}
-                onChangeLocation={handleChangeLocation}
+                onChangeLocation={(lat, lng) => {onChangeLocation(lat, lng); handleChangeLocation(lat, lng)}}
                 onChangeZoom={handleChangeZoom}
                 apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'
                 defaultLocation={defaultLocation}>
             </MapPicker>
+            </div>
         </>
     )
 }
