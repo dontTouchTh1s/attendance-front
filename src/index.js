@@ -14,6 +14,7 @@ import "./Api"
 import CreateRequest from "./Pages/CreateRquest/CreateRequest";
 import GoogleMap from "./Map/GoogleMap"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
+import WorkPlaceOptions from "./Pages/WorkPlace/WorkPlaceOptions";
 
 
 const router = createBrowserRouter([
@@ -39,8 +40,8 @@ const router = createBrowserRouter([
                 element: <CreateLeaveRequest/>,
             },
             {
-                path: "/location",
-                element: <GoogleMap/>,
+                path: "/work-place-options",
+                element: <WorkPlaceOptions/>,
             },
         ],
 
