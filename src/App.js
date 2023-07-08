@@ -8,6 +8,34 @@ import Api from "./Api";
 
 
 function App() {
+    const MINUTE_MS = 10000;
+    const geoOptions = {timeout: 10000, enableHighAccuracy: false };
+    useEffect(() => {
+
+        const interval = setInterval(() => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(success, error, geoOptions);
+            } else {
+                console.log("Geolocation not supported");
+            }
+
+            function success(position) {
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+            }
+            console.log("asdasd");
+            function error(error) {
+                console.log(error);
+            }
+
+
+        }, MINUTE_MS);
+
+        return () => clearInterval(interval);
+    }, [])
+
     useEffect(() => {
         async function getCsrf() {
             await Api.get('http://localhost:8000/sanctum/csrf-cookie');

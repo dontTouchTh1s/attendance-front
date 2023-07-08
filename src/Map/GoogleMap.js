@@ -33,6 +33,7 @@ function GoogleMap({onChangeLocation}) {
                 zoom={zoom}
                 mapTypeId="roadmap"
                 style={{height: '700px'}}
+
                 onChangeLocation={(lat, lng) => {onChangeLocation(lat, lng); handleChangeLocation(lat, lng)}}
                 onChangeZoom={handleChangeZoom}
                 apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'
