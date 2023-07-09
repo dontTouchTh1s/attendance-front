@@ -9,7 +9,7 @@ import Api from "./Api";
 
 function App() {
     const MINUTE_MS = 10000;
-    const geoOptions = {timeout: 10000, enableHighAccuracy: false };
+    const geoOptions = {};
     useEffect(() => {
 
         const interval = setInterval(() => {
@@ -38,7 +38,7 @@ function App() {
 
     useEffect(() => {
         async function getCsrf() {
-            await Api.get('http://localhost:8000/sanctum/csrf-cookie');
+            await Api.get('http://172.27.6.102:8000/sanctum/csrf-cookie');
         }
 
         getCsrf();
