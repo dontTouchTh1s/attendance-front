@@ -1,5 +1,5 @@
 import './App.css';
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {ThemeProvider} from "@mui/material";
 import RTL from "./Theme/RTL";
 import {Link, Outlet} from "react-router-dom";
@@ -9,27 +9,12 @@ import Api from "./Api";
 
 function App() {
     const MINUTE_MS = 10000;
-    const geoOptions = {};
+    const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
+    const [location, setLocation] = useState({lat: 0, lng: 0});
+    const [err, setErr] = useState('');
     useEffect(() => {
 
         const interval = setInterval(() => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(success, error, geoOptions);
-            } else {
-                console.log("Geolocation not supported");
-            }
-
-            function success(position) {
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-                console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-
-            }
-            console.log("asdasd");
-            function error(error) {
-                console.log(error);
-            }
-
 
         }, MINUTE_MS);
 
@@ -37,17 +22,43 @@ function App() {
     }, [])
 
     useEffect(() => {
+
         async function getCsrf() {
             await Api.get('http://172.27.6.102:8000/sanctum/csrf-cookie');
         }
 
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(success, error, geoOptions);
+            } else {
+                console.log("Geolocation not supported");
+            }
+
+            function success(position) {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
+                setLocation({lat: lat, lng: lng});
+                console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+
+            }
+
+            function error(error) {
+                console.log(error);
+                setErr(error.message);
+            }
+
+        }
+
+        getLocation();
         getCsrf();
     }, []);
     return (
         <ThemeProvider theme={theme}>
             <RTL>
                 <div id="sidebar">
-                    سلام این یک متن فارسی است
+                    <p>{err}</p>
+                    <p>{location.lat}</p>
+                    <p>{location.lng}</p>
                     <h1>React Router Contacts</h1>
                     <p><Link to={'/login'}>login</Link></p>
                     <p><Link to={'/sing-up'}>sing up</Link></p>

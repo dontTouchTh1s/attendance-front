@@ -16,7 +16,31 @@ import GoogleMap from "./Map/GoogleMap"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 import WorkPlaceOptions from "./Pages/WorkPlace/WorkPlaceOptions";
 
+function handlePermission() {
 
+    navigator.permissions.query({name: "geolocation"}).then((result) => {
+        console.log("shit");
+        if (result.state === "granted") {
+            report(result.state);
+        } else if (result.state === "prompt") {
+            report(result.state);
+
+        } else if (result.state === "denied") {
+            report(result.state);
+        }
+        result.addEventListener("change", () => {
+            report(result.state);
+        });
+    });
+
+
+}
+
+function report(state) {
+    console.log(`Permission ${state}`);
+}
+
+handlePermission();
 const router = createBrowserRouter([
     {
         path: "/",
