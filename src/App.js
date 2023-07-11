@@ -14,7 +14,6 @@ function App() {
     const [location, setLocation] = useState({lat: 0, lng: 0});
     const [err, setErr] = useState('');
     useEffect(() => {
-
         const interval = setInterval(() => {
 
         }, MINUTE_MS);
@@ -25,8 +24,9 @@ function App() {
     useEffect(() => {
 
         async function getCsrf() {
-            await Api.get('http://127.0.0.1:8000/sanctum/csrf-cookie');
+            await Api.get('http://localhost:8000/sanctum/csrf-cookie');
         }
+
         getCsrf();
         locationTracker(geoOptions);
 
