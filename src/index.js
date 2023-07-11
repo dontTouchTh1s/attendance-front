@@ -14,7 +14,7 @@ import "./Api"
 import CreateRequest from "./Pages/CreateRquest/CreateRequest";
 import GoogleMap from "./Map/GoogleMap"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
-import WorkPlaceOptions from "./Pages/WorkPlace/WorkPlaceOptions";
+import CreateWorkPlace from "./Pages/WorkPlace/CreateWorkPlace";
 
 function handlePermission() {
 
@@ -65,7 +65,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/work-place-options",
-                element: <WorkPlaceOptions/>,
+                element: <CreateWorkPlace/>,
             },
         ],
 

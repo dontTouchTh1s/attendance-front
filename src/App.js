@@ -5,6 +5,7 @@ import RTL from "./Theme/RTL";
 import {Link, Outlet} from "react-router-dom";
 import {theme} from "./Theme/rtl-theme";
 import Api from "./Api";
+import locationTracker from './Location/locationTracker'
 
 
 function App() {
@@ -24,33 +25,11 @@ function App() {
     useEffect(() => {
 
         async function getCsrf() {
-            await Api.get('http://172.27.6.102:8000/sanctum/csrf-cookie');
+            await Api.get('http://127.0.0.1:8000/sanctum/csrf-cookie');
         }
-
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(success, error, geoOptions);
-            } else {
-                console.log("Geolocation not supported");
-            }
-
-            function success(position) {
-                let lat = position.coords.latitude;
-                let lng = position.coords.longitude;
-                setLocation({lat: lat, lng: lng});
-                console.log(`Latitude: ${lat}, Longitude: ${lng}`);
-
-            }
-
-            function error(error) {
-                console.log(error);
-                setErr(error.message);
-            }
-
-        }
-
-        getLocation();
         getCsrf();
+        locationTracker(geoOptions);
+
     }, []);
     return (
         <ThemeProvider theme={theme}>

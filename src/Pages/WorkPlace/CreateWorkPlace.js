@@ -11,7 +11,7 @@ import {
     Select,
     TextField,
 } from "@mui/material";
-function WorkPlaceOptions(){
+function CreateWorkPlace(){
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
     const [lat, setLat] = useState(0);
@@ -97,4 +97,4 @@ function WorkPlaceOptions(){
     )
 }
 
-export default WorkPlaceOptions
+export default CreateWorkPlace
