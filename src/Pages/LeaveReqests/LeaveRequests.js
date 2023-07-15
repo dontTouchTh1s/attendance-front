@@ -6,7 +6,7 @@ import {
     InputLabel,
     MenuItem,
     Select,
-    TextField,
+    TextField, Typography,
 } from "@mui/material";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterMomentJalaali} from '@mui/x-date-pickers/AdapterMomentJalaali';
@@ -87,7 +87,15 @@ function LeaveRequests() {
     return (
 
         <LocalizationProvider dateAdapter={AdapterMomentJalaali}>
-            <Container component='main' maxWidth={'lg'}>
+            <Typography component="h1" variant="h4" sx={{marginTop: '8px'}}>
+                درخواست ها
+            </Typography>
+            <Typography component='p' sx={{marginTop: '8px'}}>
+                از این بخش میتوانید درخواست های ثبت شده توسط کارمندان را تایید یا رد کنید.
+            </Typography>
+            <Box sx={{
+                padding: '24px 0'
+            }}>
                 <Box sx={{
                     display: 'flex',
                     marginTop: '8px',
@@ -190,8 +198,7 @@ function LeaveRequests() {
                             color='error'>رد همه</Button>
                     <Button onClick={handleLogOut}>رد همه</Button>
                 </Box>
-
-            </Container>
+            </Box>
         </LocalizationProvider>
 
     )

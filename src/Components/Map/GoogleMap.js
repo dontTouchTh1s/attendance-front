@@ -32,7 +32,7 @@ function GoogleMap({onChangeLocation}) {
                 className={'google-map'}
                 zoom={zoom}
                 mapTypeId="roadmap"
-                style={{height: '700px'}}
+                style={{height: '700px', position: 'relative'}}
 
                 onChangeLocation={(lat, lng) => {onChangeLocation(lat, lng); handleChangeLocation(lat, lng)}}
                 onChangeZoom={handleChangeZoom}
