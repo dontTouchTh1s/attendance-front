@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
-
+import {useNavigate} from "react-router-dom";
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
+    const navigate = useNavigate();
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -19,7 +19,13 @@ function Login() {
         try {
             const response = await Api.post('/login', formData);
             // handle successful response
-            console.log(response);
+            localStorage.setItem('name', response.data['name']);
+            localStorage.setItem('email', response.data['email']);
+            let location = JSON.parse(response.data['workPlace']['location']);
+            localStorage.setItem('lat', location['lat']);
+            localStorage.setItem('lng', location['lng']);
+            localStorage.setItem('radius', response.data['workPlace']['radius']);
+            navigate('/dashboard');
         } catch (error) {
             if (error.response) {
                 // handle error response
