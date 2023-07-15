@@ -1,13 +1,16 @@
 .map {
     display: flex !important;
+    width: 100%;
     align-items: center !important;
     justify-content: center !important;
 }
 
 
 .google-map {
-    width: 600px !important;
+    width: 100% !important;
     height: 500px !important;
+    display: block !important;
+    position: relative !important;
 }
 
 .pin {
