@@ -12,10 +12,11 @@ import LeaveRequests from "./Pages/LeaveReqests/LeaveRequests";
 import App from "./App";
 import "./Api"
 import CreateRequest from "./Pages/CreateRquest/CreateRequest";
-import GoogleMap from "./Map/GoogleMap"
+import GoogleMap from "./Components/Map/GoogleMap"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 import CreateWorkPlace from "./Pages/WorkPlace/CreateWorkPlace";
 import Dashboard from "./Pages/dashboard/Dashboard";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 function handlePermission() {
 
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
             },
             {
                 path: "/dashboard",
-                element: <Dashboard/>,
+                element: <ProtectedRoute><Dashboard/></ProtectedRoute>,
             },
         ],
 
