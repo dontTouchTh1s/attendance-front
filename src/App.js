@@ -9,35 +9,24 @@ import locationTracker from './Location/locationTracker'
 
 
 function App() {
-    const MINUTE_MS = 10000;
     const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
-    const [location, setLocation] = useState({lat: 0, lng: 0});
-    const [err, setErr] = useState('');
-    useEffect(() => {
-        const interval = setInterval(() => {
-
-        }, MINUTE_MS);
-
-        return () => clearInterval(interval);
-    }, [])
-
     useEffect(() => {
 
         async function getCsrf() {
             await Api.get('http://localhost:8000/sanctum/csrf-cookie');
         }
 
+
         getCsrf();
+
         locationTracker(geoOptions);
 
-    }, []);
+    }, [geoOptions]);
     return (
+
         <ThemeProvider theme={theme}>
             <RTL>
                 <div id="sidebar">
-                    <p>{err}</p>
-                    <p>{location.lat}</p>
-                    <p>{location.lng}</p>
                     <h1>React Router Contacts</h1>
                     <p><Link to={'/login'}>login</Link></p>
                     <p><Link to={'/sing-up'}>sing up</Link></p>
