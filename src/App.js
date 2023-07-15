@@ -1,13 +1,17 @@
 import './App.css';
 import React, {useEffect, useState} from "react";
-import {ThemeProvider} from "@mui/material";
+import {Box, Container, ThemeProvider} from "@mui/material";
 import RTL from "./Theme/RTL";
 import {Link, Outlet} from "react-router-dom";
 import {theme} from "./Theme/rtl-theme";
 import Api from "./Api";
 import locationTracker from './Location/locationTracker'
-
-
+import MiniDrawer from "./Components/Drawer";
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
+import LoginIcon from '@mui/icons-material/Login';
+import RequestPageIcon from '@mui/icons-material/RequestPage';
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import PostAddIcon from '@mui/icons-material/PostAdd';
 function App() {
     const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
     useEffect(() => {
@@ -26,18 +30,23 @@ function App() {
 
         <ThemeProvider theme={theme}>
             <RTL>
-                <div id="sidebar">
-                    <h1>React Router Contacts</h1>
-                    <p><Link to={'/login'}>login</Link></p>
-                    <p><Link to={'/sing-up'}>sing up</Link></p>
-                    <p><Link to={'/leave-requests'}>leave requests</Link></p>
-                    <p><Link to={'/create-leave-request'}>create leave request</Link></p>
-                    <p><Link to={'/work-place-options'}>Work place options</Link></p>
+                <MiniDrawer
+                    links={['/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options']}
+                    titles={['ورود', 'ثبت نانم', 'درخواست های مرخصی', 'ایجاد درخواست مرخصی', 'محل کار']}
+                    icons={[
+                        <LoginIcon/>,
+                        <AppRegistrationIcon/>,
+                        <RequestPageIcon/>,
+                        <PostAddIcon/>,
+                        <ApartmentIcon/>
 
-                </div>
-                <Outlet>
+                    ]}>
+                    <Box sx={{padding: '24px 0'}}>
+                    <Outlet>
+                    </Outlet>
+                    </Box>
+                </MiniDrawer>
 
-                </Outlet>
             </RTL>
         </ThemeProvider>
     )
