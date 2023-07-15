@@ -43,8 +43,8 @@ function CreateLeaveRequest() {
         formData.append('to_date', dateRange[1].getDate());
         formData.append('description', description);
         if (leaveTimingType === 1) {
-            formData.append('from_hour', (dateRange[0].format('YYYY-MM-DD')));
-            formData.append('to_hour', (dateRange[1].format('YYYY-MM-DD')));
+            formData.append('from_hour', (fromHour.format('HH-mm-ss')));
+            formData.append('to_hour', (toHour.format('HH-mm-ss')));
         }
         for (const value of formData.values())
             console.log(value);
