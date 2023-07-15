@@ -1,4 +1,4 @@
-import GoogleMap from "../../Map/GoogleMap";
+import GoogleMap from "../../Components/Map/GoogleMap";
 import React, {useState} from 'react'
 import Api from "../../Api";
 import {
@@ -8,8 +8,8 @@ import {
     FormControl, IconButton,
     InputLabel,
     MenuItem,
-    Select,
-    TextField,
+    Select, TextareaAutosize,
+    TextField, Typography,
 } from "@mui/material";
 function CreateWorkPlace(){
     const [address, setAddress] = useState('');
@@ -53,13 +53,26 @@ function CreateWorkPlace(){
         setLng(lng);
     }
     return (
-        <Container component={"main"} maxWidth={"xs"}>
-            <Box component={'form'} noValidate onSubmit={handleSubmitWorkPlace}>
+        <Box>
+            <Typography component="h1" variant="h4" sx={{marginTop: '8px'}}>
+                محل کار
+            </Typography>
+            <Typography component='p' sx={{marginTop: '8px'}}>
+                برای اضافه کردن محل کار جدید، مکان آن روی نقشه را به صورت دقیق انتخاب کنید و شعاع مساحت محل کار را به صورت تقریبی وارد کنید.
+            </Typography>
+            <Box component={'form'} noValidate onSubmit={handleSubmitWorkPlace}
+                 sx={{
+                     display: 'flex',
+                     justifyContent: 'space-between',
+                     gap: '16px',
+                    padding: '16px 0'
+            }}>
                 <Box sx={{
                     display: 'flex',
                     marginTop: '8px',
                     gap: '12px',
                     flexDirection: 'column',
+                    minWidth: '40%'
                 }}>
                     <TextField
                         label={'نام'}
@@ -71,6 +84,8 @@ function CreateWorkPlace(){
                         label={'آدرس'}
                         value={address}
                         onChange={newValue => setAddress(newValue.target.value)}
+                        multiline
+                        minRows={2}
                     >
                     </TextField>
                     <TextField
@@ -80,10 +95,7 @@ function CreateWorkPlace(){
                     >
                     </TextField>
 
-                    <GoogleMap
-                        onChangeLocation={handleChangeLocation}>
 
-                    </GoogleMap>
                     <Button
                         type={'submit'}
                         variant="contained"
@@ -92,8 +104,14 @@ function CreateWorkPlace(){
                     ثبت
                     </Button>
                 </Box>
+                <Box sx={{width: '100%'}}>
+                    <GoogleMap
+                        onChangeLocation={handleChangeLocation}>
+
+                    </GoogleMap>
+                </Box>
             </Box>
-        </Container>
+        </Box>
     )
 }
 
