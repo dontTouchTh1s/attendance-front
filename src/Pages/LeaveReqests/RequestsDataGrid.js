@@ -6,26 +6,6 @@ import RTL from "../../Theme/RTL";
 import moment from "moment-jalaali";
 import Api from "../../Api";
 
-async function acceptDeclineRequest(id, status) {
-    let data = {status: status};
-    try {
-        const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
-        console.log(response)
-        // handle successful response
-    } catch (error) {
-        if (error.response) {
-            // handle error response
-            console.log(error.response.data);
-        } else if (error.request) {
-            // handle no response
-            console.log(error.request);
-        } else {
-            // handle other errors
-            console.log('Error', error.message);
-        }
-    }
-
-}
 
 const style = {
     position: 'absolute',
@@ -41,106 +21,12 @@ const style = {
     pb: 3,
 };
 
-const columns: GridColDef = [
-    {
-        field: 'id', type: 'number', headerName: 'ردیف', headerAlign: 'left',
-        align: 'left', width: '70'
-    },
-    {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
-    {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
-    {
-        field: 'createDate',
-        type: 'date',
-        headerName: 'تاریخ ثبت',
-        headerAlign: 'left',
-        minWidth: 120,
-        valueGetter: (params) => {
-            return new Date(params.value);
-        },
-        valueFormatter: (params) => {
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
-            let date = moment(params.value)
-                .format("jYYYY-jMM-jDD");
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
-            return date;
 
-        },
-    },
-    {
-        field: 'leaveFromDate',
-        type: 'date',
-        headerName: 'مرخصی از تاریخ',
-        headerAlign: 'left',
-        minWidth: 120,
-        valueGetter: (params) => {
-            return new Date(params.value);
-        },
-        valueFormatter: (params) => {
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
-            let date = moment(params.value)
-                .format("jYYYY-jMM-jDD");
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
-            return date;
-
-        },
-    },
-    {
-        field: 'leaveToDate',
-        type: 'date',
-        headerName: 'مرخصی تا تاریخ',
-        headerAlign: 'left',
-        minWidth: 120,
-        valueGetter: (params) => {
-            return new Date(params.value);
-        },
-        valueFormatter: (params) => {
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
-            let date = moment(params.value)
-                .format("jYYYY-jMM-jDD");
-            moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
-            return date;
-
-        },
-    },
-    {
-        field: "action",
-        headerName: "عملیات",
-        headerAlign: 'center',
-        sortable: false,
-        disableColumnMenu: true,
-        minWidth: 160,
-        renderCell: (params) => {
-            const onClick = (e) => {
-                e.stopPropagation(); // don't select this row after clicking
-
-                const api: GridApi = params.api;
-                const thisRow: Record<string, GridCellValue> = {};
-
-                api
-                    .getAllColumns()
-                    .filter((c) => c.field !== "__check__" && !!c)
-                    .forEach(
-                        (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
-                    );
-
-                return alert(JSON.stringify(thisRow, null, 4));
-            };
-
-            return (
-                <Box>
-                    <Button onClick={() => acceptDeclineRequest(params.id, 'accepted')}>تایید</Button>
-                    <Button onClick={() => acceptDeclineRequest(params.id, 'declined')}>رد</Button>
-                </Box>
-            );
-
-        }
-    }
-];
-
-
-function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
+function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
+    const [modalConfirmOpen, setModalConfirm] = useState(false);
+    const [clickedRowParams, setClickedRowParams] = useState({row: {}});
     useEffect(() => {
         let type;
         // Convert type to persian text
@@ -185,6 +71,127 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
         setFilterModel(newFilterModel);
     }, [filters.createDate, filters.group, filters.name, filters.toDate, filters.type]);
 
+    async function acceptDeclineRequest(e, id, status) {
+        e.stopPropagation();
+        onModifyRequest();
+        let data = {status: status};
+        try {
+            const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
+            console.log(response);
+            // handle successful response
+        } catch (error) {
+            if (error.response) {
+                // handle error response
+                console.log(error.response.data);
+            } else if (error.request) {
+                // handle no response
+                console.log(error.request);
+            } else {
+                // handle other errors
+                console.log('Error', error.message);
+            }
+        }
+        setModalInfoOpen(false);
+
+    }
+
+    const columns: GridColDef = [
+        {
+            field: 'id', type: 'number', headerName: 'ردیف', headerAlign: 'left',
+            align: 'left', width: '70'
+        },
+        {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
+        {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
+        {
+            field: 'createDate',
+            type: 'date',
+            headerName: 'تاریخ ثبت',
+            headerAlign: 'left',
+            minWidth: 120,
+            valueGetter: (params) => {
+                return new Date(params.value);
+            },
+            valueFormatter: (params) => {
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+                let date = moment(params.value)
+                    .format("jYYYY-jMM-jDD");
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+                return date;
+
+            },
+        },
+        {
+            field: 'leaveFromDate',
+            type: 'date',
+            headerName: 'مرخصی از تاریخ',
+            headerAlign: 'left',
+            minWidth: 120,
+            valueGetter: (params) => {
+                return new Date(params.value);
+            },
+            valueFormatter: (params) => {
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+                let date = moment(params.value)
+                    .format("jYYYY-jMM-jDD");
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+                return date;
+
+            },
+        },
+        {
+            field: 'leaveToDate',
+            type: 'date',
+            headerName: 'مرخصی تا تاریخ',
+            headerAlign: 'left',
+            minWidth: 120,
+            valueGetter: (params) => {
+                return new Date(params.value);
+            },
+            valueFormatter: (params) => {
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: true});
+                let date = moment(params.value)
+                    .format("jYYYY-jMM-jDD");
+                moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+                return date;
+
+            },
+        },
+        {
+            field: "action",
+            headerName: "عملیات",
+            headerAlign: 'center',
+            sortable: false,
+            disableColumnMenu: true,
+            minWidth: 160,
+            renderCell: (params) => {
+                const onClick = (e) => {
+                    e.stopPropagation(); // don't select this row after clicking
+
+                    const api: GridApi = params.api;
+                    const thisRow: Record<string, GridCellValue> = {};
+
+                    api
+                        .getAllColumns()
+                        .filter((c) => c.field !== "__check__" && !!c)
+                        .forEach(
+                            (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
+                        );
+
+                    return alert(JSON.stringify(thisRow, null, 4));
+                };
+
+                return (
+                    <Box>
+                        <Button>تایید</Button>
+                        <Button
+                            color={'error'}
+                            onClick={(event) => acceptDeclineRequest(event, params.id, 'declined')}>رد</Button>
+                    </Box>
+                );
+
+            }
+        }
+    ];
 
     return (
         <ThemeProvider theme={theme}>
@@ -200,23 +207,53 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
                     disableRowSelectionOnClick
                     sx={{}}
                     onRowSelectionModelChange={onSelectedRowsChanged}
-                    onRowClick={() => setModalInfoOpen(true)}
+                    onRowClick={(gridRowParams) => {
+                        setModalInfoOpen(true);
+                        setClickedRowParams(gridRowParams)
+                    }}
                 >
                 </DataGridPro>
-                <Modal
+                <CustomModal
                     open={modalInfoOpen}
-                    onClose={() => setModalInfoOpen(false)}>
-                    <Box sx={{...style, width: 400}}>
-                        <h2 id="parent-modal-title">Text in a modal</h2>
-                        <p id="parent-modal-description">
-                            this is test modal description
-
-                        </p>
-                    </Box>
-                </Modal>
+                    onClose={setModalInfoOpen}
+                    title={'جزییات درخواست'}
+                    params={clickedRowParams}
+                >
+                    <Button
+                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید</Button>
+                    <Button
+                        color={'error'}
+                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد</Button>
+                </CustomModal>
             </RTL>
         </ThemeProvider>
     )
+}
+
+function CustomModal({open, onClose, title, params, children}) {
+    const [loaded, setLoaded] = useState();
+    useEffect(() => {
+        if (params !== undefined) {
+            setLoaded(true);
+            console.log(params);
+        }
+    }, [params])
+    return (
+        <Modal
+            open={open}
+            onClose={() => onClose(false)}>
+            <Box sx={{...style, width: 400}}>
+                <h2 id="parent-modal-title">{title}</h2>
+                <p id="parent-modal-description">
+                    {
+                        loaded ? params.row.description : 'null'
+                    }
+                </p>
+                {children}
+            </Box>
+        </Modal>
+    )
+
 }
 
 export default RequestsDataGrid;
