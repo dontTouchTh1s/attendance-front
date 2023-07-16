@@ -40,15 +40,40 @@ function LeaveRequests() {
 
     }
 
+    async function modifyMultipleRequests(status) {
+        let requestsId = selectedRows;
+        let data = {status: status};
+        try {
+            const response = await Api.post('/requests/' + '[' + selectedRows.toString() ']', {...data, _method: 'patch'});
+            console.log(response);
+            // handle successful response
+        } catch (error) {
+            if (error.response) {
+                // handle error response
+                console.log(error.response.data);
+            } else if (error.request) {
+                // handle no response
+                console.log(error.request);
+            } else {
+                // handle other errors
+                console.log('Error', error.message);
+            }
+        }
+    }
+
+    async function requestModifyHandler() {
+        await fetchRequests();
+    }
+
     async function fetchRequests() {
         try {
-            const response = await Api.get('/requests');
+            const response = await Api.get('/requests', {params: {status: 'pending'}});
             // handle successful response
+            console.log(response)
             let data = response.data.data;
             setData({
                 rows: data
             });
-            console.log(data);
 
 
         } catch (error) {
@@ -183,6 +208,7 @@ function LeaveRequests() {
                     <RequestsDataGrid onSelectedRowsChanged={handleSelectedRowsChanged}
                                       filters={filter}
                                       data={data}
+                                      onModifyRequest={requestModifyHandler}
                     >
 
                     </RequestsDataGrid>
@@ -192,11 +218,18 @@ function LeaveRequests() {
                     display: 'flex',
                     gap: '8px'
                 }}>
-                    <Button disabled={selectedRows.length === 0} variant='contained'
-                            color='success'>تایید همه</Button>
-                    <Button disabled={selectedRows.length === 0} variant='contained'
-                            color='error'>رد همه</Button>
-                    <Button onClick={handleLogOut}>رد همه</Button>
+                    <Button disabled={selectedRows.length === 0}
+                            variant='contained'
+                            onClick={() => modifyMultipleRequests('accepted')}
+                            color='success'>
+                        تایید همه
+                    </Button>
+                    <Button disabled={selectedRows.length === 0}
+                            variant='contained'
+                            onClick={() => modifyMultipleRequests('declined')}
+                            color='error'>
+                        رد همه
+                    </Button>
                 </Box>
             </Box>
         </LocalizationProvider>
