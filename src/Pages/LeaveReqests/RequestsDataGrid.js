@@ -4,7 +4,28 @@ import {Box, Button, Modal, ThemeProvider} from "@mui/material";
 import {theme} from '../../Theme/rtl-theme'
 import RTL from "../../Theme/RTL";
 import moment from "moment-jalaali";
+import Api from "../../Api";
 
+async function acceptDeclineRequest(id, status) {
+    let data = {status: status};
+    try {
+        const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
+        console.log(response)
+        // handle successful response
+    } catch (error) {
+        if (error.response) {
+            // handle error response
+            console.log(error.response.data);
+        } else if (error.request) {
+            // handle no response
+            console.log(error.request);
+        } else {
+            // handle other errors
+            console.log('Error', error.message);
+        }
+    }
+
+}
 
 const style = {
     position: 'absolute',
@@ -34,8 +55,6 @@ const columns: GridColDef = [
         headerAlign: 'left',
         minWidth: 120,
         valueGetter: (params) => {
-            console.log(params.value);
-
             return new Date(params.value);
         },
         valueFormatter: (params) => {
@@ -54,8 +73,6 @@ const columns: GridColDef = [
         headerAlign: 'left',
         minWidth: 120,
         valueGetter: (params) => {
-            console.log(params.value);
-
             return new Date(params.value);
         },
         valueFormatter: (params) => {
@@ -74,8 +91,6 @@ const columns: GridColDef = [
         headerAlign: 'left',
         minWidth: 120,
         valueGetter: (params) => {
-            console.log(params.value);
-
             return new Date(params.value);
         },
         valueFormatter: (params) => {
@@ -110,10 +125,11 @@ const columns: GridColDef = [
 
                 return alert(JSON.stringify(thisRow, null, 4));
             };
+
             return (
                 <Box>
-                    <Button onClick={onClick}>تایید</Button>
-                    <Button onClick={onClick}>رد</Button>
+                    <Button onClick={() => acceptDeclineRequest(params.id, 'accepted')}>تایید</Button>
+                    <Button onClick={() => acceptDeclineRequest(params.id, 'declined')}>رد</Button>
                 </Box>
             );
 
@@ -180,7 +196,6 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data}) {
                     filterModel={filterModel}
                     onFilterModelChange={(model) => {
                         setFilterModel(model)
-                        console.log(model)
                     }}
                     disableRowSelectionOnClick
                     sx={{}}
