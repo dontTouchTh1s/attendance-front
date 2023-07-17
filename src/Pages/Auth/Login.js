@@ -1,12 +1,22 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
 import {useNavigate} from "react-router-dom";
+import CurrentPageContext from "../../Components/CurrentPageContext";
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const {setCurrentPage} = useContext(CurrentPageContext);
+
     const navigate = useNavigate();
+    useEffect(() => {
+        const user = localStorage.getItem('email');
+        if (user !== null){
+            setCurrentPage(0);
+            navigate('/dashboard');
+        }
+    });
 
     async function handleSubmit(e) {
         e.preventDefault();
