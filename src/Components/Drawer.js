@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import {useContext} from 'react';
+import {styled, useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -19,7 +20,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import {Link} from "react-router-dom";
-import {useState} from "react";
+import CurrentPageContext from "./CurrentPageContext";
 
 const drawerWidth = 240;
 
@@ -91,7 +92,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 export default function MiniDrawer({titles, links, icons, children}) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const [selected, setSelected] = useState();
+    const {currentPage, setCurrentPage} = useContext(CurrentPageContext);
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -134,7 +135,7 @@ export default function MiniDrawer({titles, links, icons, children}) {
                     {titles.map((text, index) => (
                         <ListItem key={text} disablePadding sx={{ display: 'block' }}>
                             <Link
-                                onClick={() => setSelected(index)}
+                                onClick={() => setCurrentPage(index)}
                                 to={links[index]}
                                 style = {{
                                     textDecoration: 'none ' ,
@@ -150,7 +151,7 @@ export default function MiniDrawer({titles, links, icons, children}) {
                                 >
                                 <ListItemIcon
                                     sx={{
-                                        color: selected === index ? 'blue' : '#0000008a',
+                                        color: currentPage === index ? 'blue' : '#0000008a',
                                         minWidth: 0,
                                         mr: open ? 3 : 'auto',
                                         justifyContent: 'center',
@@ -158,7 +159,7 @@ export default function MiniDrawer({titles, links, icons, children}) {
                                 >
                                     {icons[index]}
                                 </ListItemIcon>
-                                <ListItemText primary={text} sx={{opacity: open ? 1 : 0, color: selected === index ? 'blue' : 'inherit'}}/>
+                                <ListItemText primary={text} sx={{opacity: open ? 1 : 0, color: currentPage === index ? 'blue' : 'inherit'}}/>
                                 </ListItemButton>
                             </Link>
                         </ListItem>
