@@ -1,4 +1,4 @@
-import {DataGridPro, GridApi, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
+import {DataGridPro, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useEffect, useState} from "react";
 import {Box, Button, Modal, ThemeProvider} from "@mui/material";
 import {theme} from '../../Theme/rtl-theme'
@@ -25,7 +25,6 @@ const style = {
 function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
-    const [modalConfirmOpen, setModalConfirm] = useState(false);
     const [clickedRowParams, setClickedRowParams] = useState({row: {}});
     useEffect(() => {
         let type;
@@ -59,11 +58,11 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
 
         if (filters.createDate[0] !== null && filters.createDate[1] !== null) {
             newFilterModel.items.push({
-                id: 3, field: 'date', operator: 'onOrAfter',
+                id: 3, field: 'createDate', operator: 'onOrAfter',
                 value: filters.createDate[0].locale('en_US').format('YYYY-MM-DD')
             });
             newFilterModel.items.push({
-                id: 4, field: 'date', operator: 'onOrBefore',
+                id: 4, field: 'createDate', operator: 'onOrBefore',
                 value: filters.createDate[1].locale('en_US').format('YYYY-MM-DD')
             });
         }
@@ -73,10 +72,15 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
 
     async function acceptDeclineRequest(e, id, status) {
         e.stopPropagation();
-        onModifyRequest();
-        let data = {status: status};
+        let row = {
+            status: status
+        };
+        let data = {
+            rows : row,
+        };
+
         try {
-            const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
+            const response = await Api.post('/requests/' + id , {...data, _method: 'patch'});
             console.log(response);
             // handle successful response
         } catch (error) {
@@ -92,7 +96,7 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             }
         }
         setModalInfoOpen(false);
-
+        onModifyRequest();
     }
 
     const columns: GridColDef = [
@@ -164,22 +168,6 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             disableColumnMenu: true,
             minWidth: 160,
             renderCell: (params) => {
-                const onClick = (e) => {
-                    e.stopPropagation(); // don't select this row after clicking
-
-                    const api: GridApi = params.api;
-                    const thisRow: Record<string, GridCellValue> = {};
-
-                    api
-                        .getAllColumns()
-                        .filter((c) => c.field !== "__check__" && !!c)
-                        .forEach(
-                            (c) => (thisRow[c.field] = params.getValue(params.id, c.field))
-                        );
-
-                    return alert(JSON.stringify(thisRow, null, 4));
-                };
-
                 return (
                     <Box>
                         <Button>تایید</Button>
@@ -213,47 +201,28 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     }}
                 >
                 </DataGridPro>
-                <CustomModal
+
+                <Modal
                     open={modalInfoOpen}
-                    onClose={setModalInfoOpen}
-                    title={'جزییات درخواست'}
-                    params={clickedRowParams}
-                >
-                    <Button
-                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید</Button>
-                    <Button
-                        color={'error'}
-                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد</Button>
-                </CustomModal>
+                    onClose={() => setModalInfoOpen(false)}>
+                    <Box sx={{...style, width: 400}}>
+                        <h2 id="parent-modal-title">{'جزییات در خواست'}</h2>
+                        <p id="parent-modal-description">
+                            {clickedRowParams.row.description}
+
+                        </p>
+                        <Button
+                            onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
+                        </Button>
+                        <Button
+                            color={'error'}
+                            onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
+                        </Button>
+                    </Box>
+                </Modal>
             </RTL>
         </ThemeProvider>
     )
-}
-
-function CustomModal({open, onClose, title, params, children}) {
-    const [loaded, setLoaded] = useState();
-    useEffect(() => {
-        if (params !== undefined) {
-            setLoaded(true);
-            console.log(params);
-        }
-    }, [params])
-    return (
-        <Modal
-            open={open}
-            onClose={() => onClose(false)}>
-            <Box sx={{...style, width: 400}}>
-                <h2 id="parent-modal-title">{title}</h2>
-                <p id="parent-modal-description">
-                    {
-                        loaded ? params.row.description : 'null'
-                    }
-                </p>
-                {children}
-            </Box>
-        </Modal>
-    )
-
 }
 
 export default RequestsDataGrid;
