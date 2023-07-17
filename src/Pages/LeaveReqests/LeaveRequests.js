@@ -1,12 +1,14 @@
 import {
     Box,
     Button,
-    Container,
-    FormControl, IconButton,
+    FormControl,
+    IconButton,
     InputLabel,
     MenuItem,
+    Modal,
     Select,
-    TextField, Typography,
+    TextField,
+    Typography,
 } from "@mui/material";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterMomentJalaali} from '@mui/x-date-pickers/AdapterMomentJalaali';
@@ -19,7 +21,19 @@ import {DateRangePicker} from "@mui/x-date-pickers-pro/DateRangePicker";
 import './leave-request.css';
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
-
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    pt: 2,
+    px: 4,
+    pb: 3,
+};
 
 function LeaveRequests() {
     const [filter, setFilter] = useState({
@@ -29,8 +43,11 @@ function LeaveRequests() {
         type: 0,
         group: 0
     });
+    const [confirmStatus, setConfirmStatus] = useState('');
     const [data, setData] = useState({rows: []});
     const [selectedRows, setSelectedRows] = useState([]);
+    const [modifyMultipleStatus, setModifyMultipleStatus] = useState('')
+    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     useEffect(() => {
         fetchRequests();
     }, [])
@@ -41,10 +58,16 @@ function LeaveRequests() {
     }
 
     async function modifyMultipleRequests(status) {
-        let requestsId = selectedRows;
-        let data = {status: status};
+        let row = {
+            status: status
+        };
+        let data = {
+            rows : row,
+            ids: (selectedRows)
+        };
+
         try {
-            const response = await Api.post('/requests/' + '[' + selectedRows.toString() ']', {...data, _method: 'patch'});
+            const response = await Api.post('/requests/' , {...data, _method: 'patch'});
             console.log(response);
             // handle successful response
         } catch (error) {
@@ -59,6 +82,7 @@ function LeaveRequests() {
                 console.log('Error', error.message);
             }
         }
+        await fetchRequests();
     }
 
     async function requestModifyHandler() {
@@ -90,23 +114,13 @@ function LeaveRequests() {
         }
     }
 
-    async function handleLogOut() {
-        try {
-            const response = await Api.post('/logout');
-            // handle successful response
-            console.log(response.data);
-        } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
-        }
+    function openConfirmModal(status) {
+
+        if (status === 'accepted')
+            setConfirmStatus('تایید');
+        else setConfirmStatus('رد');
+        setConfirmModalOpen(true);
+        setModifyMultipleStatus(status);
     }
 
     return (
@@ -220,18 +234,55 @@ function LeaveRequests() {
                 }}>
                     <Button disabled={selectedRows.length === 0}
                             variant='contained'
-                            onClick={() => modifyMultipleRequests('accepted')}
+                            onClick={() => {openConfirmModal('accepted')}}
                             color='success'>
                         تایید همه
                     </Button>
                     <Button disabled={selectedRows.length === 0}
                             variant='contained'
-                            onClick={() => modifyMultipleRequests('declined')}
+                            onClick={() => {openConfirmModal('declined')}}
                             color='error'>
                         رد همه
                     </Button>
                 </Box>
             </Box>
+
+            <Modal
+                open={confirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}>
+                <Box sx={{...style, width: 400}}>
+                    <h2 id="parent-modal-title">{confirmStatus}{' درخواست ها'}</h2>
+                    <p id="parent-modal-description">
+                        آیا از {confirmStatus} {selectedRows.length} درخواست مطمعن هستید؟
+
+                    </p>
+                    <Button
+                        sx = {{
+                            marginLeft: '8px'
+                        }}
+                        disabled={selectedRows.length === 0}
+                        variant='contained'
+                        onClick={async () => {
+                            await modifyMultipleRequests('accepted');
+                            setConfirmModalOpen(false)
+                        }}
+                        color='success'>
+                        بله
+                    </Button>
+                    <Button
+                        sx = {{
+                        marginLeft: '8px'
+                        }}
+                        disabled={selectedRows.length === 0}
+                        variant='contained'
+                        onClick={() => setConfirmModalOpen(false)}
+                        color='error'>
+                        خیر
+                    </Button>
+                </Box>
+            </Modal>
+
+
         </LocalizationProvider>
 
     )
