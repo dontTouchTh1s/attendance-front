@@ -1,8 +1,8 @@
 import './App.css';
 import React, {useEffect, useState} from "react";
-import {Box, Container, ThemeProvider} from "@mui/material";
+import {Box, ThemeProvider} from "@mui/material";
 import RTL from "./Theme/RTL";
-import {Link, Outlet} from "react-router-dom";
+import {Outlet} from "react-router-dom";
 import {theme} from "./Theme/rtl-theme";
 import Api from "./Api";
 import locationTracker from './Location/locationTracker'
@@ -12,7 +12,12 @@ import LoginIcon from '@mui/icons-material/Login';
 import RequestPageIcon from '@mui/icons-material/RequestPage';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import PostAddIcon from '@mui/icons-material/PostAdd';
+import CurrentPageContext from "./Components/CurrentPageContext";
+import DashboardIcon from '@mui/icons-material/Dashboard';
+
 function App() {
+    const [currentPage, setCurrentPage] = useState();
+
     const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
     useEffect(() => {
 
@@ -30,10 +35,12 @@ function App() {
 
         <ThemeProvider theme={theme}>
             <RTL>
+                <CurrentPageContext.Provider value={{currentPage, setCurrentPage}}>
                 <MiniDrawer
-                    links={['/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options']}
-                    titles={['ورود', 'ثبت نانم', 'درخواست های مرخصی', 'ایجاد درخواست مرخصی', 'محل کار']}
+                    links={['/dashboard', '/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options']}
+                    titles={['داشبورد', 'ورود', 'ثبت نانم', 'درخواست های مرخصی', 'ایجاد درخواست مرخصی', 'محل کار']}
                     icons={[
+                        <DashboardIcon/>,
                         <LoginIcon/>,
                         <AppRegistrationIcon/>,
                         <RequestPageIcon/>,
@@ -46,6 +53,7 @@ function App() {
                     </Outlet>
                     </Box>
                 </MiniDrawer>
+                </CurrentPageContext.Provider>
 
             </RTL>
         </ThemeProvider>
