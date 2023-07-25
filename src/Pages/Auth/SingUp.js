@@ -21,7 +21,7 @@ function SingUp() {
         formData.append("password", password);
 
         try {
-            const response = Api.post('/register', formData);
+            const response = Api.post('/auth/register', formData);
             console.log(response)
             // handle successful response
         } catch (error) {

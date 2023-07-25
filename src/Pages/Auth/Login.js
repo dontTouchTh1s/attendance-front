@@ -7,16 +7,7 @@ import CurrentPageContext from "../../Components/CurrentPageContext";
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {setCurrentPage} = useContext(CurrentPageContext);
 
-    const navigate = useNavigate();
-    useEffect(() => {
-        const user = localStorage.getItem('email');
-        if (user !== null){
-            setCurrentPage(0);
-            navigate('/dashboard');
-        }
-    });
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -27,7 +18,7 @@ function Login() {
 
 
         try {
-            const response = await Api.post('/login', formData);
+            const response = await Api.post('/auth/login', formData);
             // handle successful response
             localStorage.setItem('name', response.data['name']);
             localStorage.setItem('email', response.data['email']);
@@ -35,7 +26,6 @@ function Login() {
             localStorage.setItem('lat', location['lat']);
             localStorage.setItem('lng', location['lng']);
             localStorage.setItem('radius', response.data['workPlace']['radius']);
-            navigate('/dashboard');
         } catch (error) {
             if (error.response) {
                 // handle error response
