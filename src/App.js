@@ -1,6 +1,6 @@
 import './App.css';
 import React, {useEffect, useState} from "react";
-import {Box, ThemeProvider} from "@mui/material";
+import {Box, CssBaseline, ThemeProvider} from "@mui/material";
 import RTL from "./Theme/RTL";
 import {Outlet} from "react-router-dom";
 import {theme} from "./Theme/rtl-theme";
@@ -34,7 +34,7 @@ function App() {
     return (
         <RTL>
             <ThemeProvider theme={theme}>
-
+                <CssBaseline/>
                 <CurrentPageContext.Provider value={{currentPage, setCurrentPage}}>
                     <MiniDrawer
                         links={['/Dashboard', '/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options', 'attendance-leaves']}
