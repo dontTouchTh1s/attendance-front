@@ -14,6 +14,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import CurrentPageContext from "./Components/CurrentPageContext";
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 function App() {
     const [currentPage, setCurrentPage] = useState();
@@ -25,38 +26,38 @@ function App() {
             await Api.get('http://localhost:8000/sanctum/csrf-cookie');
         }
 
-
         getCsrf();
 
         locationTracker(geoOptions);
 
-    }, [geoOptions]);
+    });
     return (
+        <RTL>
+            <ThemeProvider theme={theme}>
 
-        <ThemeProvider theme={theme}>
-            <RTL>
                 <CurrentPageContext.Provider value={{currentPage, setCurrentPage}}>
-                <MiniDrawer
-                    links={['/dashboard', '/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options']}
-                    titles={['داشبورد', 'ورود', 'ثبت نانم', 'درخواست های مرخصی', 'ایجاد درخواست مرخصی', 'محل کار']}
-                    icons={[
-                        <DashboardIcon/>,
-                        <LoginIcon/>,
-                        <AppRegistrationIcon/>,
-                        <RequestPageIcon/>,
-                        <PostAddIcon/>,
-                        <ApartmentIcon/>
-
-                    ]}>
-                    <Box sx={{padding: '24px 0'}}>
-                    <Outlet>
-                    </Outlet>
-                    </Box>
-                </MiniDrawer>
+                    <MiniDrawer
+                        links={['/Dashboard', '/login', '/sing-up', '/leave-requests', '/create-leave-request', '/work-place-options', 'attendance-leaves']}
+                        titles={['داشبورد', 'ورود', 'ثبت نانم', 'درخواست های مرخصی', 'ایجاد درخواست مرخصی', 'محل کار', 'ورود و خروج']}
+                        icons={[
+                            <DashboardIcon/>,
+                            <LoginIcon/>,
+                            <AppRegistrationIcon/>,
+                            <RequestPageIcon/>,
+                            <PostAddIcon/>,
+                            <ApartmentIcon/>,
+                            <AccessTimeIcon/>
+                        ]}>
+                        <Box sx={{padding: '24px 0'}}>
+                            <Outlet>
+                            </Outlet>
+                        </Box>
+                    </MiniDrawer>
                 </CurrentPageContext.Provider>
 
-            </RTL>
-        </ThemeProvider>
+            </ThemeProvider>
+        </RTL>
+
     )
 }
 
