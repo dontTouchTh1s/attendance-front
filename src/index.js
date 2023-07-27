@@ -18,6 +18,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import AlreadyLogin from "./Components/AlreadyLogin";
 import ShowAttendanceLeave from "./Pages/AttendanceLeave/ShowAttendanceLeave";
 import CreateGroupPolicy from "./Pages/GroupPolicies/CreateGroupPolicy";
+import CreatePenaltyCondition from "./Pages/PenlatyConditions/CreatePenaltyCondition";
 
 function handlePermission() {
 
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
             {
                 path: "/create-group-policy",
                 element: <ProtectedRoute><CreateGroupPolicy/></ProtectedRoute>,
+            },
+            {
+                path: "/create-penalty-condition",
+                element: <ProtectedRoute><CreatePenaltyCondition/></ProtectedRoute>,
             },
         ],
 
