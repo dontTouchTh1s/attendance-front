@@ -1,14 +1,16 @@
 import {useNavigate} from "react-router-dom";
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import Api from "../Api";
 
 function ProtectedRoute({children}) {
     const navigate = useNavigate();
+    const [checked, setChecked] = useState(false);
+
     useEffect(() => {
         async function getUser() {
             try {
                 await Api.get('/auth/');
-
+                setChecked(true);
             } catch (error) {
                 if (error.response) {
                     // handle error response
@@ -28,7 +30,9 @@ function ProtectedRoute({children}) {
     });
 
 
-    return children;
+    return (
+        checked ? children : ''
+    );
 }
 
 export default ProtectedRoute
