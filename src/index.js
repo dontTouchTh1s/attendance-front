@@ -13,8 +13,11 @@ import App from "./App";
 import "./Api"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 import CreateWorkPlace from "./Pages/WorkPlace/CreateWorkPlace";
-import Dashboard from "./Pages/dashboard/Dashboard";
+import Dashboard from "./Pages/Dashboard/Dashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import AlreadyLogin from "./Components/AlreadyLogin";
+import ShowAttendanceLeave from "./Pages/AttendanceLeave/ShowAttendanceLeave";
+import CreateGroupPolicy from "./Pages/GroupPolicies/CreateGroupPolicy";
 
 function handlePermission() {
 
@@ -41,27 +44,35 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/login",
-                element: <Login/>,
+                element: <AlreadyLogin><Login/></AlreadyLogin>,
             },
             {
                 path: "/sing-up",
-                element: <SingUp/>,
+                element: <AlreadyLogin><SingUp/></AlreadyLogin>
             },
             {
                 path: "/leave-requests",
-                element: <LeaveRequests/>,
+                element: <ProtectedRoute><LeaveRequests/></ProtectedRoute>
             },
             {
                 path: "/create-leave-request",
-                element: <CreateLeaveRequest/>,
+                element: <ProtectedRoute><CreateLeaveRequest/></ProtectedRoute>
             },
             {
                 path: "/work-place-options",
-                element: <CreateWorkPlace/>,
+                element: <ProtectedRoute><CreateWorkPlace/></ProtectedRoute>
             },
             {
-                path: "/dashboard",
+                path: "/Dashboard",
                 element: <ProtectedRoute><Dashboard/></ProtectedRoute>,
+            },
+            {
+                path: "/attendance-leaves",
+                element: <ProtectedRoute><ShowAttendanceLeave/></ProtectedRoute>,
+            },
+            {
+                path: "/create-group-policy",
+                element: <ProtectedRoute><CreateGroupPolicy/></ProtectedRoute>,
             },
         ],
 
