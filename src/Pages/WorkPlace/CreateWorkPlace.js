@@ -22,7 +22,7 @@ function CreateWorkPlace() {
 
 
         try {
-            const response = await Api.post('/work-place/create', formData);
+            const response = await Api.post('/work-places/create', formData);
             console.log(response);
             // handle successful response
 
