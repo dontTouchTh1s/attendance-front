@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
-import {useNavigate} from "react-router-dom";
-import CurrentPageContext from "../../Components/CurrentPageContext";
+
 
 function Login() {
     const [email, setEmail] = useState('');
