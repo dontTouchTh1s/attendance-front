@@ -19,6 +19,7 @@ import {AdapterMomentJalaali} from '@mui/x-date-pickers-pro/AdapterMomentJalaali
 import dayjs from "dayjs";
 import './create-request.css';
 import moment from "moment-jalaali";
+import Grid from "@mui/material/Unstable_Grid2";
 
 function CreateLeaveRequest() {
     const [type, setType] = useState('');
@@ -27,8 +28,8 @@ function CreateLeaveRequest() {
         moment().add(1, 'days'),
     ]);
     //
-    const [fromHour, setFromHour] = useState(dayjs('2022-04-17T15:30'));
-    const [toHour, setToHour] = useState(dayjs('2022-04-17T15:30'));
+    const [fromHour, setFromHour] = useState(moment('2022-04-17T15:30'));
+    const [toHour, setToHour] = useState(moment('2022-04-17T15:30'));
     const [description, setDescription] = useState('');
     const [leaveTimingType, setLeaveTimingType] = useState('');
 
@@ -39,12 +40,13 @@ function CreateLeaveRequest() {
         let formData = new FormData();
         formData.append('type', 'leave');
         formData.append('leave_type', type);
-        formData.append('from_date', dateRange[0].getDate());
-        formData.append('to_date', dateRange[1].getDate());
+        formData.append('from_date', dateRange[0].format('YYYY-MM-DD'));
+        formData.append('to_date', dateRange[1].format('YYYY-MM-DD'));
         formData.append('description', description);
-        if (leaveTimingType === 1) {
-            formData.append('from_hour', (fromHour.format('HH-mm-ss')));
-            formData.append('to_hour', (toHour.format('HH-mm-ss')));
+        console.log(leaveTimingType)
+        if (leaveTimingType === 'hourly') {
+            formData.append('from_hour', (fromHour.format('HH:mm:ss')));
+            formData.append('to_hour', (toHour.format('HH:mm:ss')));
         }
         for (const value of formData.values())
             console.log(value);
@@ -80,25 +82,16 @@ function CreateLeaveRequest() {
     return (
         <Box>
             <LocalizationProvider dateAdapter={AdapterMomentJalaali}>
-                <CssBaseline/>
                 <Typography component="h1" variant="h4">
                     ارسال درخواست مرخصی
                 </Typography>
                 <Typography component='p' sx={{marginTop: '8px'}}>
                     برای ارسال درخواست مرخصی ابتدا نوع و زمان آن را مشخص کنید، سپس با نوشتن توضیحات آن را ارسال کنید.
                 </Typography>
-                <Container component={'main'} maxWidth={'sm'}>
-
-                    <Box component="form" onSubmit={handleSubmit} noValidate>
-                        <Box sx={{
-                            display: 'flex',
-                            padding: '16px 0',
-                            gap: '12px',
-                            flexDirection: 'column',
-                        }}>
-                            <FormControl sx={{
-                                width: '100%',
-                            }}>
+                <Container disableGutters maxWidth={'md'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+                    <Grid container spacing={{xs: 2, md: 3}}>
+                        <Grid sm={6} xs={12}>
+                            <FormControl fullWidth>
                                 <InputLabel id="type-label">نوع مرخصی</InputLabel>
                                 <Select
                                     labelId="type-label"
@@ -114,11 +107,9 @@ function CreateLeaveRequest() {
                                     <MenuItem value={'optional'}>انتخابی</MenuItem>
                                 </Select>
                             </FormControl>
-
-                            <FormControl
-                                sx={{
-                                    width: '100%',
-                                }}>
+                        </Grid>
+                        <Grid sm={6} xs={12}>
+                            <FormControl fullWidth>
                                 <InputLabel id="type-label">نوع خروج</InputLabel>
                                 <Select
                                     labelId="type-label"
@@ -132,54 +123,65 @@ function CreateLeaveRequest() {
                                     <MenuItem value={'hourly'}>ساعتی</MenuItem>
                                 </Select>
                             </FormControl>
-                            <FormControl className={hourPickerDisplay + " form-control"}
-                                         sx={{
-                                             display: 'flex',
-                                             gap: '12px'
-                                         }}>
+                        </Grid>
+                        <Grid xs={12} container spacing={{xs: 2, md: 3}}
+                              className={hourPickerDisplay + " form-control"}>
+                            <Grid xs={12}>
                                 <DatePicker
+                                    sx={{width: '100%'}}
                                     value={dateRange[0]}
                                     onChange={(newValue) => setDateRange([newValue, newValue])}
-                                    fullWidth
                                     label="تاریخ"
                                     name="date"
                                     id="date">
                                 </DatePicker>
+                            </Grid>
+                            <Grid xs={12} sm={6}>
                                 <TimePicker
+                                    sx={{width: '100%'}}
                                     label="از ساعت"
                                     value={fromHour}
                                     onChange={(newValue) => setFromHour(newValue)}
                                 />
+                            </Grid>
+                            <Grid xs={12} sm={6}>
                                 <TimePicker
+                                    sx={{width: '100%'}}
                                     label="تا ساعت"
                                     value={toHour}
                                     onChange={(newValue) => setToHour(newValue)}
                                 />
-                            </FormControl>
+                            </Grid>
+                        </Grid>
+                        <Grid xs={12}>
                             <DateRangePicker
                                 className={dateRangePicker + " form-control"}
                                 localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
                                 value={dateRange}
                                 onChange={handleDateRangeChange}
                             />
-
+                        </Grid>
+                        <Grid xs={12}>
                             <TextField
+                                fullWidth
                                 id="description"
                                 label="توضیحات"
                                 multiline
                                 value={description}
                                 onChange={newValue => setDescription(newValue.target.value)}
                             />
+                        </Grid>
 
-                        </Box>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            sx={{mt: 3, mb: 2}}
-                            fullWidth
-                        >ارسال درخواست
-                        </Button>
-                    </Box>
+                        <Grid xs={12} sm={6} md={4}>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                sx={{mt: 3, mb: 2}}
+                                fullWidth
+                            >ارسال درخواست
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Container>
             </LocalizationProvider>
         </Box>
