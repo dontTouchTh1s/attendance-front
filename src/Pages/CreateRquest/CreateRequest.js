@@ -6,18 +6,18 @@ import {
     Container,
     CssBaseline,
     FormControl,
-    InputLabel, MenuItem,
+    InputLabel,
+    MenuItem,
     Select,
     TextField,
     Typography
 } from "@mui/material";
 import Api from "../../Api";
-import {LocalizationProvider, TimePicker} from '@mui/x-date-pickers-pro';
+import {DatePicker, LocalizationProvider, TimePicker} from '@mui/x-date-pickers-pro';
 import {DateRangePicker} from '@mui/x-date-pickers-pro/DateRangePicker';
 import {AdapterMomentJalaali} from '@mui/x-date-pickers-pro/AdapterMomentJalaali';
 import dayjs from "dayjs";
 import './create-request.css';
-import {DatePicker} from "@mui/x-date-pickers-pro";
 import moment from "moment-jalaali";
 
 function CreateLeaveRequest() {
@@ -78,22 +78,21 @@ function CreateLeaveRequest() {
     }
 
     return (
-        <LocalizationProvider dateAdapter={AdapterMomentJalaali}>
-            <Container component={"main"} maxWidth={"xs"}>
+        <Box>
+            <LocalizationProvider dateAdapter={AdapterMomentJalaali}>
                 <CssBaseline/>
-                <Box sx={{
-                    marginTop: 8,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center'
-                }}>
-                    <Typography component="h1" variant="h4">
-                        ارسال درخواست مرخصی
-                    </Typography>
+                <Typography component="h1" variant="h4">
+                    ارسال درخواست مرخصی
+                </Typography>
+                <Typography component='p' sx={{marginTop: '8px'}}>
+                    برای ارسال درخواست مرخصی ابتدا نوع و زمان آن را مشخص کنید، سپس با نوشتن توضیحات آن را ارسال کنید.
+                </Typography>
+                <Container component={'main'} maxWidth={'sm'}>
+
                     <Box component="form" onSubmit={handleSubmit} noValidate>
                         <Box sx={{
                             display: 'flex',
-                            marginTop: '8px',
+                            padding: '16px 0',
                             gap: '12px',
                             flexDirection: 'column',
                         }}>
@@ -178,12 +177,12 @@ function CreateLeaveRequest() {
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                             fullWidth
-                        >ورود
+                        >ارسال درخواست
                         </Button>
                     </Box>
-                </Box>
-            </Container>
-        </LocalizationProvider>
+                </Container>
+            </LocalizationProvider>
+        </Box>
     );
 }
 

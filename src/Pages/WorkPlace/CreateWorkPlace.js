@@ -1,23 +1,16 @@
 import GoogleMap from "../../Components/Map/GoogleMap";
 import React, {useState} from 'react'
 import Api from "../../Api";
-import {
-    Box,
-    Button,
-    Container,
-    FormControl, IconButton,
-    InputLabel,
-    MenuItem,
-    Select, TextareaAutosize,
-    TextField, Typography,
-} from "@mui/material";
-function CreateWorkPlace(){
+import {Box, Button, TextField, Typography,} from "@mui/material";
+
+function CreateWorkPlace() {
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
     const [lat, setLat] = useState(0);
     const [lng, setLng] = useState(0);
     const [radius, setRadius] = useState(0);
-    async function handleSubmitWorkPlace(e){
+
+    async function handleSubmitWorkPlace(e) {
         e.preventDefault();
         // Insert new work place to database
         let formData = new FormData();
@@ -26,7 +19,6 @@ function CreateWorkPlace(){
         formData.append('radius', radius);
         formData.append('lat', lat);
         formData.append('lng', lng);
-
 
 
         try {
@@ -48,28 +40,30 @@ function CreateWorkPlace(){
         }
 
     }
-    function handleChangeLocation(lat, lng){
+
+    function handleChangeLocation(lat, lng) {
         setLat(lat);
         setLng(lng);
     }
+
     return (
         <Box>
             <Typography component="h1" variant="h4" sx={{marginTop: '8px'}}>
                 محل کار
             </Typography>
             <Typography component='p' sx={{marginTop: '8px'}}>
-                برای اضافه کردن محل کار جدید، مکان آن روی نقشه را به صورت دقیق انتخاب کنید و شعاع مساحت محل کار را به صورت تقریبی وارد کنید.
+                برای اضافه کردن محل کار جدید، مکان آن روی نقشه را به صورت دقیق انتخاب کنید و شعاع مساحت محل کار را به
+                صورت تقریبی وارد کنید.
             </Typography>
             <Box component={'form'} noValidate onSubmit={handleSubmitWorkPlace}
                  sx={{
                      display: 'flex',
                      justifyContent: 'space-between',
                      gap: '16px',
-                    padding: '16px 0'
-            }}>
+                     padding: '16px 0'
+                 }}>
                 <Box sx={{
                     display: 'flex',
-                    marginTop: '8px',
                     gap: '12px',
                     flexDirection: 'column',
                     minWidth: '40%'
@@ -101,7 +95,7 @@ function CreateWorkPlace(){
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                     >
-                    ثبت
+                        ثبت
                     </Button>
                 </Box>
                 <Box sx={{width: '100%'}}>
