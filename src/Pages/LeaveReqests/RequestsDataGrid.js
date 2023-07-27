@@ -1,8 +1,6 @@
 import {DataGridPro, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useEffect, useState} from "react";
-import {Box, Button, Modal, ThemeProvider} from "@mui/material";
-import {theme} from '../../Theme/rtl-theme'
-import RTL from "../../Theme/RTL";
+import {Box, Button, Modal} from "@mui/material";
 import moment from "moment-jalaali";
 import Api from "../../Api";
 
@@ -76,11 +74,11 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             status: status
         };
         let data = {
-            rows : row,
+            rows: row,
         };
 
         try {
-            const response = await Api.post('/requests/' + id , {...data, _method: 'patch'});
+            const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
             console.log(response);
             // handle successful response
         } catch (error) {
@@ -182,46 +180,44 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
     ];
 
     return (
-        <ThemeProvider theme={theme}>
-            <RTL>
-                <DataGridPro
-                    {...data}
-                    columns={columns}
-                    checkboxSelection
-                    filterModel={filterModel}
-                    onFilterModelChange={(model) => {
-                        setFilterModel(model)
-                    }}
-                    disableRowSelectionOnClick
-                    sx={{}}
-                    onRowSelectionModelChange={onSelectedRowsChanged}
-                    onRowClick={(gridRowParams) => {
-                        setModalInfoOpen(true);
-                        setClickedRowParams(gridRowParams)
-                    }}
-                >
-                </DataGridPro>
+        <>
+            <DataGridPro
+                {...data}
+                columns={columns}
+                checkboxSelection
+                filterModel={filterModel}
+                onFilterModelChange={(model) => {
+                    setFilterModel(model)
+                }}
+                disableRowSelectionOnClick
+                sx={{}}
+                onRowSelectionModelChange={onSelectedRowsChanged}
+                onRowClick={(gridRowParams) => {
+                    setModalInfoOpen(true);
+                    setClickedRowParams(gridRowParams)
+                }}
+            >
+            </DataGridPro>
 
-                <Modal
-                    open={modalInfoOpen}
-                    onClose={() => setModalInfoOpen(false)}>
-                    <Box sx={{...style, width: 400}}>
-                        <h2 id="parent-modal-title">{'جزییات در خواست'}</h2>
-                        <p id="parent-modal-description">
-                            {clickedRowParams.row.description}
+            <Modal
+                open={modalInfoOpen}
+                onClose={() => setModalInfoOpen(false)}>
+                <Box sx={{...style, width: 400}}>
+                    <h2 id="parent-modal-title">{'جزییات در خواست'}</h2>
+                    <p id="parent-modal-description">
+                        {clickedRowParams.row.description}
 
-                        </p>
-                        <Button
-                            onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
-                        </Button>
-                        <Button
-                            color={'error'}
-                            onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
-                        </Button>
-                    </Box>
-                </Modal>
-            </RTL>
-        </ThemeProvider>
+                    </p>
+                    <Button
+                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
+                    </Button>
+                    <Button
+                        color={'error'}
+                        onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
+                    </Button>
+                </Box>
+            </Modal>
+        </>
     )
 }
 
