@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useContext} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {styled, useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -20,7 +20,7 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import {Link} from "react-router-dom";
-import CurrentPageContext from "./CurrentPageContext";
+import CurrentPageContext from "../Contexts/CurrentPageContext";
 
 const drawerWidth = 240;
 
@@ -45,7 +45,7 @@ const closedMixin = (theme) => ({
     },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
+const DrawerHeader = styled('div')(({theme}) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -56,7 +56,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
+})(({theme, open}) => ({
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
         easing: theme.transitions.easing.sharp,
@@ -72,8 +72,8 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
+const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})(
+    ({theme, open}) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
@@ -89,10 +89,14 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-export default function MiniDrawer({titles, links, icons, children}) {
+export default function MiniDrawer({pages, children}) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const {currentPage, setCurrentPage} = useContext(CurrentPageContext);
+    const [navBarCurrentPage, setNavBarCurrentPage] = useState('');
+    const currentPage = useContext(CurrentPageContext);
+    useEffect(() => {
+        currentPage.current = {page: navBarCurrentPage, set: setNavBarCurrentPage};
+    }, [])
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -102,8 +106,8 @@ export default function MiniDrawer({titles, links, icons, children}) {
     };
 
     return (
-        <Box sx={{ display: 'flex', }}>
-            <CssBaseline />
+        <Box sx={{display: 'flex',}}>
+            <CssBaseline/>
             <AppBar position="fixed" open={open}>
                 <Toolbar>
                     <IconButton
@@ -113,10 +117,10 @@ export default function MiniDrawer({titles, links, icons, children}) {
                         edge="start"
                         sx={{
                             marginRight: 5,
-                            ...(open && { display: 'none' }),
+                            ...(open && {display: 'none'}),
                         }}
                     >
-                        <MenuIcon />
+                        <MenuIcon/>
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
                         سامانه ثحم
@@ -126,49 +130,55 @@ export default function MiniDrawer({titles, links, icons, children}) {
             <Drawer variant="permanent" open={open}>
                 <DrawerHeader>
                     <IconButton onClick={handleDrawerClose}>
-                        {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        {theme.direction === 'rtl' ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
                     </IconButton>
                 </DrawerHeader>
-                <Divider />
+                <Divider/>
                 <List>
 
-                    {titles.map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                    {pages.map((page, index) => (
+                        <ListItem key={page.title} disablePadding sx={{display: 'block'}}>
                             <Link
-                                onClick={() => setCurrentPage(index)}
-                                to={links[index]}
-                                style = {{
-                                    textDecoration: 'none ' ,
+                                onClick={() => {
+                                    setNavBarCurrentPage(page.path)
+                                }}
+                                to={page.path}
+                                style={{
+                                    textDecoration: 'none ',
                                     color: "inherit"
                                 }}
                             >
                                 <ListItemButton
                                     sx={{
 
-                                            minHeight: 48,
-                                            justifyContent: open ? 'initial' : 'center',
-                                            px: 2.5}}
-                                >
-                                <ListItemIcon
-                                    sx={{
-                                        color: currentPage === index ? 'blue' : '#0000008a',
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5
                                     }}
                                 >
-                                    {icons[index]}
-                                </ListItemIcon>
-                                <ListItemText primary={text} sx={{opacity: open ? 1 : 0, color: currentPage === index ? 'blue' : 'inherit'}}/>
+                                    <ListItemIcon
+                                        sx={{
+                                            color: currentPage.current.page === page.path ? 'blue' : '#0000008a',
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {page.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={page.title} sx={{
+                                        opacity: open ? 1 : 0,
+                                        color: currentPage.current.page === page.path ? 'blue' : 'inherit'
+                                    }}/>
                                 </ListItemButton>
                             </Link>
                         </ListItem>
                     ))}
                 </List>
-                <Divider />
+                <Divider/>
                 <List>
                     {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{ display: 'block' }}>
+                        <ListItem key={text} disablePadding sx={{display: 'block'}}>
                             <ListItemButton
                                 sx={{
                                     minHeight: 48,
@@ -183,16 +193,16 @@ export default function MiniDrawer({titles, links, icons, children}) {
                                         justifyContent: 'center',
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                                    {index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}
                                 </ListItemIcon>
-                                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                                <ListItemText primary={text} sx={{opacity: open ? 1 : 0}}/>
                             </ListItemButton>
                         </ListItem>
                     ))}
                 </List>
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                <DrawerHeader />
+            <Box component="main" sx={{flexGrow: 1, p: 3}}>
+                <DrawerHeader/>
                 {children}
             </Box>
         </Box>
