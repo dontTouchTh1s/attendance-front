@@ -20,7 +20,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import {DateRangePicker} from "@mui/x-date-pickers-pro/DateRangePicker";
 import './leave-request.css';
 
-//moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
 const style = {
     position: 'absolute',
     top: '50%',
@@ -38,17 +38,17 @@ const style = {
 function LeaveRequests() {
     const [filter, setFilter] = useState({
         createDate: [
-            moment('2023-05-01'),
-            moment('2023-11-01')],
+            null,
+            null],
         leaveDate: [null, null],
         name: '',
-        type: 0,
-        group: 0
+        type: 'all',
+        group: 0,
+        status: 'pending'
     });
     const [confirmStatus, setConfirmStatus] = useState('');
     const [data, setData] = useState({rows: []});
     const [selectedRows, setSelectedRows] = useState([]);
-    const [modifyMultipleStatus, setModifyMultipleStatus] = useState('')
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     useEffect(() => {
         fetchRequests();
@@ -122,7 +122,6 @@ function LeaveRequests() {
             setConfirmStatus('تایید');
         else setConfirmStatus('رد');
         setConfirmModalOpen(true);
-        setModifyMultipleStatus(status);
     }
 
     return (
@@ -132,7 +131,8 @@ function LeaveRequests() {
                 درخواست ها
             </Typography>
             <Typography component='p' sx={{marginTop: '8px'}}>
-                از این بخش میتوانید درخواست های ثبت شده توسط کارمندان را تایید یا رد کنید.
+                از این بخش میتوانید درخواست های ثبت شده توسط کارمندان را تایید یا رد کنید. مرخصی ها به صورت نزدیک ترین
+                تاریخ مرتب شده اند.
             </Typography>
             <Box sx={{
                 padding: '24px 0'
@@ -155,10 +155,10 @@ function LeaveRequests() {
                             label="نوع مرخصی"
                             autoFocus
                         >
-                            <MenuItem value={0}>همه</MenuItem>
-                            <MenuItem value={1}>استحقاقی</MenuItem>
-                            <MenuItem value={2}>استعلاحی</MenuItem>
-                            <MenuItem value={3}>بدون حقوق</MenuItem>
+                            <MenuItem value={'all'}>همه</MenuItem>
+                            <MenuItem value={'paid'}>استحقاقی</MenuItem>
+                            <MenuItem value={'sick'}>استعلاحی</MenuItem>
+                            <MenuItem value={'noPay'}>بدون حقوق</MenuItem>
                         </Select>
                     </FormControl>
                     <FormControl sx={{
@@ -210,6 +210,25 @@ function LeaveRequests() {
                         onChange={(e) =>
                             setFilter({...filter, name: e.target.value})}>
                     </TextField>
+
+                    <FormControl sx={{
+                        minWidth: '150px'
+                    }}>
+                        <InputLabel id="type-label">وضعیت</InputLabel>
+                        <Select
+                            autoWidth
+                            value={filter.status}
+                            onChange={(e) => setFilter({...filter, status: e.target.value})}
+                            label="وضعیت"
+                            autoFocus
+                        >
+                            <MenuItem value={'all'}>همه</MenuItem>
+                            <MenuItem value={'pending'}>در حال بررسی</MenuItem>
+                            <MenuItem value={'accepted'}>تایید شده</MenuItem>
+                            <MenuItem value={'declined'}>رد شده</MenuItem>
+                        </Select>
+                    </FormControl>
+
                     <IconButton
                         sx={{
                             width: '54px'
@@ -227,7 +246,6 @@ function LeaveRequests() {
                                       data={data}
                                       onModifyRequest={requestModifyHandler}
                     >
-
                     </RequestsDataGrid>
                 </Box>
                 <Box sx={{
