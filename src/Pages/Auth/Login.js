@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
 import {useNavigate} from "react-router-dom";
@@ -89,6 +89,7 @@ function Login() {
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                         fullWidth
+                        onClick={handleSubmit}
                     >ورود
                     </Button>
                 </Box>

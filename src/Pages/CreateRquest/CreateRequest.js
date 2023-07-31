@@ -4,7 +4,6 @@ import {
     Box,
     Button,
     Container,
-    CssBaseline,
     FormControl,
     InputLabel,
     MenuItem,
@@ -16,7 +15,6 @@ import Api from "../../Api";
 import {DatePicker, LocalizationProvider, TimePicker} from '@mui/x-date-pickers-pro';
 import {DateRangePicker} from '@mui/x-date-pickers-pro/DateRangePicker';
 import {AdapterMomentJalaali} from '@mui/x-date-pickers-pro/AdapterMomentJalaali';
-import dayjs from "dayjs";
 import './create-request.css';
 import moment from "moment-jalaali";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -43,13 +41,11 @@ function CreateLeaveRequest() {
         formData.append('from_date', dateRange[0].format('YYYY-MM-DD'));
         formData.append('to_date', dateRange[1].format('YYYY-MM-DD'));
         formData.append('description', description);
-        console.log(leaveTimingType)
+
         if (leaveTimingType === 'hourly') {
             formData.append('from_hour', (fromHour.format('HH:mm:ss')));
             formData.append('to_hour', (toHour.format('HH:mm:ss')));
         }
-        for (const value of formData.values())
-            console.log(value);
 
 
         try {
@@ -75,7 +71,6 @@ function CreateLeaveRequest() {
     let dateRangePicker = leaveTimingType === 'daily' ? '' : 'hidden';
 
     function handleDateRangeChange(dateRage) {
-        dateRage.map(date => date.getDay);
         setDateRange(dateRage)
     }
 
@@ -167,6 +162,7 @@ function CreateLeaveRequest() {
                                 id="description"
                                 label="توضیحات"
                                 multiline
+                                minRows={3}
                                 value={description}
                                 onChange={newValue => setDescription(newValue.target.value)}
                             />
@@ -178,6 +174,7 @@ function CreateLeaveRequest() {
                                 variant="contained"
                                 sx={{mt: 3, mb: 2}}
                                 fullWidth
+                                onClick={handleSubmit}
                             >ارسال درخواست
                             </Button>
                         </Grid>

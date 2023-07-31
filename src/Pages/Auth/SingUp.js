@@ -113,6 +113,7 @@ function SingUp() {
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                         fullWidth
+                        onClick={handleSubmit}
                     >ورود
                     </Button>
                 </Box>
