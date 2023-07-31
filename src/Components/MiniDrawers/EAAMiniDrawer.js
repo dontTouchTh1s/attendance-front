@@ -1,14 +1,15 @@
 import MiniDrawer from "../Drawer";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import LoginIcon from "@mui/icons-material/Login";
-import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
-import RequestPageIcon from "@mui/icons-material/RequestPage";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import ApartmentIcon from "@mui/icons-material/Apartment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import BackHandIcon from '@mui/icons-material/BackHand';
 import {Box} from "@mui/material";
 import {Outlet} from "react-router-dom";
 import React from "react";
+import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
+import PanToolIcon from '@mui/icons-material/PanTool';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
 function EmployeeDrawer() {
     return (
@@ -32,27 +33,27 @@ function EmployeeDrawer() {
                 {
                     path: '/panel/objections',
                     title: 'اعتراضات',
-                    icon: <AccessTimeIcon/>
+                    icon: <BackHandIcon/>
                 },
                 {
                     path: '/panel/manager/leave-requests',
                     title: 'درخواست های مرخصی',
-                    icon: <RequestPageIcon/>
+                    icon: <EventBusyIcon/>
                 },
                 {
                     path: '/panel/manager/work-places',
                     title: 'محل کار',
-                    icon: <ApartmentIcon/>
+                    icon: <AddHomeWorkIcon/>
                 },
                 {
                     path: '/panel/manager/attendance-leaves',
                     title: 'ورود و خروج کارکنان',
-                    icon: <AccessTimeIcon/>
+                    icon: <ApartmentIcon/>
                 },
                 {
                     path: '/panel/manager/objections',
                     title: 'اعتراضات کارکنان',
-                    icon: <AccessTimeIcon/>
+                    icon: <PanToolIcon/>
                 },
             ]}>
             <Box sx={{padding: '24px 0'}}>
