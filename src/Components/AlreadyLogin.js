@@ -1,19 +1,22 @@
 import {useNavigate} from "react-router-dom";
 import {useContext, useEffect, useState} from "react";
 import Api from "../Api";
-import CurrentPageContext from "./CurrentPageContext";
+import CurrentPageContext from "../Contexts/CurrentPageContext";
+import UserContext from "../Contexts/UserContext";
 
 function AlreadyLogin({children}) {
     const navigate = useNavigate();
-    const {setCurrentPage} = useContext(CurrentPageContext);
+    const currentPage = useContext(CurrentPageContext);
     const [checked, setChecked] = useState(false);
+    const user = useContext(UserContext);
     useEffect(() => {
         async function getUser() {
             try {
                 let response = await Api.get('/auth/');
                 if (response.status === 200) {
-                    setCurrentPage(0);
-                    navigate('/Dashboard');
+                    user.current.setNavBarUser(response.data);
+                    currentPage.current.set('/panel');
+                    navigate('/panel');
                 }
                 setChecked(true);
             } catch (error) {
@@ -22,7 +25,7 @@ function AlreadyLogin({children}) {
         }
 
         getUser();
-    });
+    }, []);
     return (
         checked ? children : ''
     )

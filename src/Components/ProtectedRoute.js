@@ -1,21 +1,34 @@
 import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Api from "../Api";
+import UserContext from "../Contexts/UserContext";
+import CurrentPageContext from "../Contexts/CurrentPageContext";
 
-function ProtectedRoute({children}) {
+function ProtectedRoute({requiredRoll, children}) {
     const navigate = useNavigate();
+    const user = useContext(UserContext);
+    const currentPage = useContext(CurrentPageContext);
     const [checked, setChecked] = useState(false);
 
     useEffect(() => {
         async function getUser() {
             try {
-                await Api.get('/auth/');
+                let response = await Api.get('/auth/');
+                user.current.setNavBarUser(response.data);
                 setChecked(true);
+                if (requiredRoll !== undefined) {
+                    if (!requiredRoll.includes(response.data.roll)) {
+                        navigate('/panel');
+                    }
+                }
             } catch (error) {
                 if (error.response) {
                     // handle error response
-                    if (error.response.status === 401)
+                    if (error.response.status === 401) {
+                        currentPage.current.set('/panel');
+                        user.current.setNavBarUser({});
                         navigate('/login');
+                    }
                 } else if (error.request) {
                     // handle no response
                     console.log(error.request);
@@ -27,8 +40,7 @@ function ProtectedRoute({children}) {
         }
 
         getUser();
-    });
-
+    }, []);
 
     return (
         checked ? children : ''

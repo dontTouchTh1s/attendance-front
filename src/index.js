@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
@@ -16,9 +16,15 @@ import CreateWorkPlace from "./Pages/WorkPlace/CreateWorkPlace";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import AlreadyLogin from "./Components/AlreadyLogin";
-import ShowAttendanceLeave from "./Pages/AttendanceLeave/ShowAttendanceLeave";
+import ShowAttendanceLeavesManager from "./Pages/AttendanceLeave/ShowAttendanceLeavesManager";
 import CreateGroupPolicy from "./Pages/GroupPolicies/CreateGroupPolicy";
 import CreatePenaltyCondition from "./Pages/PenlatyConditions/CreatePenaltyCondition";
+import ShowAttendanceLeaves from "./Pages/AttendanceLeave/ShowAttendanceLeaves";
+import locationTracker from "./Location/locationTracker";
+import Api from "./Api";
+import ShowObjectionsManager from "./Pages/Objections/ShowObjectionsManager";
+import ShowObjections from "./Pages/Objections/ShowObjections";
+import Home from "./Pages/Home/Home";
 
 function handlePermission() {
 
@@ -35,6 +41,20 @@ function handlePermission() {
 
 }
 
+async function getCsrf() {
+    try {
+        await Api.get('http://localhost:8000/sanctum/csrf-cookie');
+    } catch (error) {
+        console.log("error while connecting to server");
+        console.log(error.response);
+    }
+}
+
+await getCsrf();
+
+const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
+locationTracker(geoOptions);
+
 
 handlePermission();
 const router = createBrowserRouter([
@@ -43,6 +63,11 @@ const router = createBrowserRouter([
         element: <App/>,
         errorElement: <ErrorPage/>,
         children: [
+            // Guest routes
+            {
+                path: "/",
+                element: <Home/>,
+            },
             {
                 path: "/login",
                 element: <AlreadyLogin><Login/></AlreadyLogin>,
@@ -51,44 +76,75 @@ const router = createBrowserRouter([
                 path: "/sing-up",
                 element: <AlreadyLogin><SingUp/></AlreadyLogin>
             },
+            // User routes
             {
-                path: "/leave-requests",
-                element: <ProtectedRoute><LeaveRequests/></ProtectedRoute>
-            },
-            {
-                path: "/create-leave-request",
-                element: <ProtectedRoute><CreateLeaveRequest/></ProtectedRoute>
-            },
-            {
-                path: "/work-place-options",
-                element: <ProtectedRoute><CreateWorkPlace/></ProtectedRoute>
-            },
-            {
-                path: "/Dashboard",
+                path: "/panel/",
                 element: <ProtectedRoute><Dashboard/></ProtectedRoute>,
             },
             {
-                path: "/attendance-leaves",
-                element: <ProtectedRoute><ShowAttendanceLeave/></ProtectedRoute>,
+                path: "/panel/create-leave-request",
+                element: <ProtectedRoute><CreateLeaveRequest/></ProtectedRoute>
             },
             {
-                path: "/create-group-policy",
-                element: <ProtectedRoute><CreateGroupPolicy/></ProtectedRoute>,
+                path: "/panel/attendance-leaves",
+                element: <ProtectedRoute><ShowAttendanceLeaves/></ProtectedRoute>
             },
             {
-                path: "/create-penalty-condition",
-                element: <ProtectedRoute><CreatePenaltyCondition/></ProtectedRoute>,
+                path: "/panel/objections",
+                element: <ProtectedRoute><ShowObjections/></ProtectedRoute>
+            },
+
+            // Manager routes
+            {
+                path: "/panel/manager/leave-requests",
+                element: <ProtectedRoute
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <LeaveRequests/>
+                </ProtectedRoute>
+            },
+            {
+                path: "/panel/manager/attendance-leaves",
+                element: <ProtectedRoute
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <ShowAttendanceLeavesManager/>
+                </ProtectedRoute>,
+            },
+            {
+                path: "/panel/manager/create-group-policy",
+                element: <ProtectedRoute
+                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <CreateGroupPolicy/>
+                </ProtectedRoute>,
+            },
+            {
+                path: "/panel/manager/create-penalty-condition",
+                element: <ProtectedRoute
+                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <CreatePenaltyCondition/>
+                </ProtectedRoute>,
+            },
+            {
+                path: "/panel/manager/work-places",
+                element: <ProtectedRoute
+                    requiredRoll={['managerAdministrativeAffairs']}>
+                    <CreateWorkPlace/>
+                </ProtectedRoute>
+            },
+            {
+                path: "/panel/manager/objections",
+                element: <ProtectedRoute
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <ShowObjectionsManager/>
+                </ProtectedRoute>
             },
         ],
-
     }
-
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <React.StrictMode>
+    <StrictMode>
         <RouterProvider router={router}/>
-    </React.StrictMode>
+    </StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
