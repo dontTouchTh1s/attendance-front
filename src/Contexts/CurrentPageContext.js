@@ -1,5 +1,5 @@
 import {createContext} from "react";
 
 
-const CurrentPageContext = createContext({});
+const CurrentPageContext = createContext();
 export default CurrentPageContext;

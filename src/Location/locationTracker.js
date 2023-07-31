@@ -30,12 +30,10 @@ export default function locationTracker(geoOptions) {
 
         if (d > radius) {
             // User is out of workplace
-
             console.log('is out');
             if (localStorage.getItem('employeeStatus') !== 'out') {
                 console.log(localStorage.getItem('employeeStatus'));
                 try {
-
                     let data = new FormData();
                     data.append('date', moment().format('YYYY-MM-DD HH-mm-ss'))
                     data.append('type', 'leave');
@@ -54,7 +52,6 @@ export default function locationTracker(geoOptions) {
                         console.log('Error', error.message);
                     }
                 }
-
             }
         } else {
             // User is IN of workplace
@@ -79,10 +76,8 @@ export default function locationTracker(geoOptions) {
                         console.log('Error', error.message);
                     }
                 }
-
             }
         }
-
     }
 
     function error(error) {

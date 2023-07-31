@@ -1,27 +1,27 @@
 import React, {useEffect, useState} from 'react';
 
 import {
-    Box,
+    Box, Container,
     Typography
 } from "@mui/material";
 import Api from "../../Api";
-import AttendanceLeaveDataGrid from "./AttendanceLeaveDataGrid";
+import AttendanceLeaveDataGridManager from "./AttendanceLeaveDataGridManager";
 
-function ShowAttendanceLeave() {
+function ShowAttendanceLeavesManager() {
     const [attendanceLeaves, setAttendanceLeaves] = useState({rows: []});
     useEffect(() => {
+        async function getAttendanceLeaves() {
+            const response = await Api.get('/attendance-leaves/');
+            // handle successful response
+            console.log(response)
+            let data = response.data;
+            setAttendanceLeaves({
+                rows: data
+            });
+        }
+
         getAttendanceLeaves();
     }, [])
-
-    async function getAttendanceLeaves() {
-        const response = await Api.get('/attendance-leaves/');
-        // handle successful response
-        console.log(response)
-        let data = response.data;
-        setAttendanceLeaves({
-            rows: data
-        });
-    }
 
     return (
         <Box>
@@ -32,13 +32,14 @@ function ShowAttendanceLeave() {
                 زمان ورود و خروج کارکنان در جدول زیر نمایش داده شده است. در صورت خطا یا تداخل میتوانید آنها را به صورت
                 دستی ویرایش کنید.
             </Typography>
-            <AttendanceLeaveDataGrid
-                data={attendanceLeaves}>
-
-            </AttendanceLeaveDataGrid>
+            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+                <AttendanceLeaveDataGridManager
+                    data={attendanceLeaves}>
+                </AttendanceLeaveDataGridManager>
+            </Container>
         </Box>
     )
 
 }
 
-export default ShowAttendanceLeave;
+export default ShowAttendanceLeavesManager;

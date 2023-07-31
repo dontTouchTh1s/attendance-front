@@ -55,18 +55,20 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
         }
 
         if (filters.createDate[0] !== null && filters.createDate[1] !== null) {
+            console.log('not null')
             newFilterModel.items.push({
                 id: 3, field: 'createDate', operator: 'onOrAfter',
-                value: filters.createDate[0].locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[0].locale('en_US').format('jYYYY-jMM-jDD')
             });
             newFilterModel.items.push({
                 id: 4, field: 'createDate', operator: 'onOrBefore',
-                value: filters.createDate[1].locale('en_US').format('YYYY-MM-DD')
+                value: filters.createDate[1].locale('en_US').format('jYYYY-jMM-jDD')
             });
         }
-
+        console.log(filters.createDate)
+        console.log(newFilterModel);
         setFilterModel(newFilterModel);
-    }, [filters.createDate, filters.group, filters.name, filters.toDate, filters.type]);
+    }, [filters.createDate, filters.name, filters.toDate, filters.type, filters]);
 
     async function acceptDeclineRequest(e, id, status) {
         e.stopPropagation();
@@ -110,6 +112,7 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             headerName: 'تاریخ ثبت',
             headerAlign: 'left',
             minWidth: 120,
+            sortable: true,
             valueGetter: (params) => {
                 return new Date(params.value);
             },
@@ -159,6 +162,30 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             },
         },
         {
+            field: 'stauts',
+            type: 'string',
+            headerName: 'وضعیت',
+            headerAlign: 'left',
+            minWidth: 120,
+            valueFormatter: (params) => {
+                switch (params.value) {
+                    case 'pending':
+                        return 'در حال بررسی'
+                        break;
+                    case 'accepted':
+                        return 'تایید شده'
+                        break;
+                    case 'declined':
+                        return 'رد شده'
+                        break;
+                    default:
+                        return 'مقدار نامعبر'
+                        break;
+
+                }
+            },
+        },
+        {
             field: "action",
             headerName: "عملیات",
             headerAlign: 'center',
@@ -167,7 +194,7 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             minWidth: 160,
             renderCell: (params) => {
                 return (
-                    <Box>
+                    <Box sx={{width: '100%'}}>
                         <Button>تایید</Button>
                         <Button
                             color={'error'}

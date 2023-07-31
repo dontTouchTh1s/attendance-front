@@ -7,7 +7,6 @@ import {
     FormControl,
     InputLabel,
     MenuItem,
-    Paper,
     Select,
     TextField,
     Typography

@@ -10,8 +10,8 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterMomentJalaali} from '@mui/x-date-pickers/AdapterMomentJalaali';
+import {LocalizationProvider} from "@mui/x-date-pickers-pro";
+import {AdapterMomentJalaali} from '@mui/x-date-pickers-pro/AdapterMomentJalaali';
 import moment from 'moment-jalaali';
 import React, {useEffect, useState} from 'react';
 import Api from "../../Api";
@@ -20,7 +20,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import {DateRangePicker} from "@mui/x-date-pickers-pro/DateRangePicker";
 import './leave-request.css';
 
-moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
+//moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
 const style = {
     position: 'absolute',
     top: '50%',
@@ -37,7 +37,9 @@ const style = {
 
 function LeaveRequests() {
     const [filter, setFilter] = useState({
-        createDate: [null, null],
+        createDate: [
+            moment('2023-05-01'),
+            moment('2023-11-01')],
         leaveDate: [null, null],
         name: '',
         type: 0,
@@ -62,12 +64,12 @@ function LeaveRequests() {
             status: status
         };
         let data = {
-            rows : row,
+            rows: row,
             ids: (selectedRows)
         };
 
         try {
-            const response = await Api.post('/requests/' , {...data, _method: 'patch'});
+            const response = await Api.post('/requests/', {...data, _method: 'patch'});
             console.log(response);
             // handle successful response
         } catch (error) {
@@ -91,7 +93,7 @@ function LeaveRequests() {
 
     async function fetchRequests() {
         try {
-            const response = await Api.get('/requests', {params: {status: 'pending'}});
+            const response = await Api.get('/requests');
             // handle successful response
             console.log(response)
             let data = response.data.data;
@@ -160,6 +162,7 @@ function LeaveRequests() {
                         </Select>
                     </FormControl>
                     <FormControl sx={{
+                        display: 'none',
                         minWidth: '150px'
                     }}>
                         <InputLabel id="group-label">گروه پرسنلی</InputLabel>
@@ -234,13 +237,17 @@ function LeaveRequests() {
                 }}>
                     <Button disabled={selectedRows.length === 0}
                             variant='contained'
-                            onClick={() => {openConfirmModal('accepted')}}
+                            onClick={() => {
+                                openConfirmModal('accepted')
+                            }}
                             color='success'>
                         تایید همه
                     </Button>
                     <Button disabled={selectedRows.length === 0}
                             variant='contained'
-                            onClick={() => {openConfirmModal('declined')}}
+                            onClick={() => {
+                                openConfirmModal('declined')
+                            }}
                             color='error'>
                         رد همه
                     </Button>
@@ -257,7 +264,7 @@ function LeaveRequests() {
 
                     </p>
                     <Button
-                        sx = {{
+                        sx={{
                             marginLeft: '8px'
                         }}
                         disabled={selectedRows.length === 0}
@@ -270,8 +277,8 @@ function LeaveRequests() {
                         بله
                     </Button>
                     <Button
-                        sx = {{
-                        marginLeft: '8px'
+                        sx={{
+                            marginLeft: '8px'
                         }}
                         disabled={selectedRows.length === 0}
                         variant='contained'
