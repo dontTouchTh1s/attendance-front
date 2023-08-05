@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import moment from "moment-jalaali";
 import {Box, Button, Modal, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
-import Grid from "@mui/material/Unstable_Grid2";
+import "../../Theme/data-grid.css";
 
 const style = {
     position: 'absolute',
@@ -24,10 +24,6 @@ function UserObjectionDataGrid({data}) {
     const [modalObjectionOpen, setModalObjectionOpen] = useState(false);
     const [clickedRowParams, setClickedRowParams] = useState({row: {}});
     const [description, setDescription] = useState('');
-
-    function objectionToAttendanceLeave() {
-        setModalObjectionOpen(true);
-    }
 
     const columns: GridColDef = [
         {
@@ -103,6 +99,7 @@ function UserObjectionDataGrid({data}) {
     return (
         <>
             <DataGridPro
+                className={'long-data-grid'}
                 {...data}
                 columns={columns}
                 checkboxSelection
@@ -111,7 +108,6 @@ function UserObjectionDataGrid({data}) {
                 //     setFilterModel(model)
                 // }}
                 disableRowSelectionOnClick
-                sx={{}}
                 // onRowSelectionModelChange={onSelectedRowsChanged}
                 onRowClick={(gridRowParams) => {
                     setClickedRowParams(gridRowParams)

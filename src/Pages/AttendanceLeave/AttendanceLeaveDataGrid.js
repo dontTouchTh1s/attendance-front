@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import moment from "moment-jalaali";
 import {Box, Button, Modal, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
-import Grid from "@mui/material/Unstable_Grid2";
+import "../../Theme/data-grid.css";
 
 const style = {
     position: 'absolute',
@@ -120,6 +120,7 @@ function AttendanceLeaveDataGrid({data}) {
     return (
         <>
             <DataGridPro
+                className={'long-data-grid'}
                 {...data}
                 columns={columns}
                 checkboxSelection
@@ -128,7 +129,6 @@ function AttendanceLeaveDataGrid({data}) {
                 //     setFilterModel(model)
                 // }}
                 disableRowSelectionOnClick
-                sx={{}}
                 // onRowSelectionModelChange={onSelectedRowsChanged}
                 onRowClick={(gridRowParams) => {
                     setClickedRowParams(gridRowParams)

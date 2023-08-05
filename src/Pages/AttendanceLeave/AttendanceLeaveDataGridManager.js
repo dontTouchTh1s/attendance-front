@@ -2,6 +2,7 @@ import {DataGridPro, GridColDef} from "@mui/x-data-grid-pro";
 import React from "react";
 import moment from "moment-jalaali";
 import {Box, Button} from "@mui/material";
+import "../../Theme/data-grid.css";
 
 const columns: GridColDef = [
     {
@@ -50,6 +51,7 @@ function AttendanceLeaveDataGridManager({data}) {
     return (
         <>
             <DataGridPro
+                className={'long-data-grid'}
                 {...data}
                 columns={columns}
                 checkboxSelection
@@ -58,7 +60,6 @@ function AttendanceLeaveDataGridManager({data}) {
                 //     setFilterModel(model)
                 // }}
                 disableRowSelectionOnClick
-                sx={{}}
                 // onRowSelectionModelChange={onSelectedRowsChanged}
                 // onRowClick={(gridRowParams) => {
                 //     setModalInfoOpen(true);
