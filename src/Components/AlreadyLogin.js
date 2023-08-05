@@ -15,17 +15,18 @@ function AlreadyLogin({children}) {
                 let response = await Api.get('/auth/');
                 if (response.status === 200) {
                     user.current.setNavBarUser(response.data);
-                    currentPage.current.set('/panel');
+                    currentPage.current.setNavBarCurrentPage('/panel');
                     navigate('/panel');
                 }
                 setChecked(true);
             } catch (error) {
+
                 setChecked(true);
             }
         }
 
         getUser();
-    }, []);
+    });
     return (
         checked ? children : ''
     )
