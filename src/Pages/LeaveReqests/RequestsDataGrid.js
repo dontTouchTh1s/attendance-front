@@ -1,8 +1,11 @@
 import {DataGridPro, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
-import React, {useEffect, useState} from "react";
-import {Box, Button, Modal} from "@mui/material";
+import React, {useContext, useEffect, useState} from "react";
+import {Box, Button, darken, lighten, Modal} from "@mui/material";
 import moment from "moment-jalaali";
 import Api from "../../Api";
+import {styled} from "@mui/material/styles";
+import {abs} from "stylis";
+import UserContext from "../../Contexts/UserContext";
 
 
 const style = {
@@ -19,54 +22,118 @@ const style = {
     pb: 3,
 };
 
+const StyledDataGrid = styled(DataGridPro)(({theme}) => ({
+    '& .app-theme-different--0': {
+        backgroundColor: 'rgba(248, 45, 45, 0.7)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.8)',
+        }
+    },
+    '& .app-theme-different--1': {
+        backgroundColor: 'rgba(248, 45, 45, 0.6)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.7)',
+        }
+    },
+    '& .app-theme-different--2': {
+        backgroundColor: 'rgba(248, 45, 45, 0.5)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.6)',
+        }
+    },
+    '& .app-theme-different--3': {
+        backgroundColor: 'rgba(248, 45, 45, 0.4)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.5)',
+        }
+    },
+    '& .app-theme-different--4': {
+        backgroundColor: 'rgba(248, 45, 45, 0.3)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.4)'
+        }
+    },
+    '& .app-theme-different--5': {
+        backgroundColor: 'rgba(248, 45, 45, 0.2)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.3)',
+        }
+    },
+    '& .app-theme-different--6': {
+        backgroundColor: 'rgba(248, 45, 45, 0.1)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.2)',
+        }
+    },
+    '& .app-theme-different--7': {
+        backgroundColor: 'rgba(248, 45, 45, 0.08)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.18)',
+        }
+    },
+    '& .app-theme-different--8': {
+        backgroundColor: 'rgba(248, 45, 45, 0.06)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.16)',
+        }
+    },
+    '& .app-theme-different--9': {
+        backgroundColor: 'rgba(248, 45, 45, 0.04)',
+        '&:hover': {
+            backgroundColor: 'rgba(248, 45, 45, 0.14)',
+        }
+    },
+}));
 
 function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
     const [clickedRowParams, setClickedRowParams] = useState({row: {}});
+    const user = useContext(UserContext);
+
     useEffect(() => {
-        let type;
         // Convert type to persian text
         // eslint-disable-next-line default-case
-        switch (filters.type) {
-            case 0:
-                type = 'همه';
-                break;
-            case 1:
-                type = 'استحقاقی';
-                break;
-            case 2:
-                type = 'استعلاجی';
-                break;
-            case 3:
-                type = 'بدون حقوق';
-                break;
-        }
+
         let newFilterModel = {
             items: [],
             logicOperator: GridLogicOperator.And,
         }
 
-        if (filters.type !== 0) {
-            newFilterModel.items.push({id: 1, field: 'type', operator: 'is', value: type});
+        if (filters.type !== 'all') {
+            newFilterModel.items.push({id: 1, field: 'type', operator: 'is', value: filters.type});
         }
+
+        if (filters.status !== 'all') {
+            newFilterModel.items.push({id: 1, field: 'status', operator: 'is', value: filters.status});
+        }
+
         if (filters.name !== '') {
             newFilterModel.items.push({id: 2, field: 'name', operator: 'contains', value: filters.name});
         }
 
         if (filters.createDate[0] !== null && filters.createDate[1] !== null) {
-            console.log('not null')
             newFilterModel.items.push({
                 id: 3, field: 'createDate', operator: 'onOrAfter',
-                value: filters.createDate[0].locale('en_US').format('jYYYY-jMM-jDD')
+                value: filters.createDate[0].locale('en_US').format('YYYY-MM-DD')
             });
             newFilterModel.items.push({
                 id: 4, field: 'createDate', operator: 'onOrBefore',
-                value: filters.createDate[1].locale('en_US').format('jYYYY-jMM-jDD')
+                value: filters.createDate[1].locale('en_US').format('YYYY-MM-DD')
             });
         }
-        console.log(filters.createDate)
-        console.log(newFilterModel);
+
+        if (filters.leaveDate[0] !== null && filters.leaveDate[1] !== null) {
+            newFilterModel.items.push({
+                id: 3, field: 'leaveDate', operator: 'onOrAfter',
+                value: filters.leaveDate[0].locale('en_US').format('YYYY-MM-DD')
+            });
+            newFilterModel.items.push({
+                id: 4, field: 'leaveDate', operator: 'onOrBefore',
+                value: filters.leaveDate[1].locale('en_US').format('YYYY-MM-DD')
+            });
+        }
+
         setFilterModel(newFilterModel);
     }, [filters.createDate, filters.name, filters.toDate, filters.type, filters]);
 
@@ -105,14 +172,28 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             align: 'left', width: '70'
         },
         {field: 'name', type: 'string', headerName: 'نام', headerAlign: 'left', minWidth: 150},
-        {field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110},
+        {
+            field: 'type', type: 'singleSelect', headerName: 'نوع', headerAlign: 'left', minWidth: 110,
+            valueFormatter: (params) => {
+                switch (params.value) {
+                    case 'paid':
+                        return 'استحقاقی'
+                        break;
+                    case 'sick':
+                        return 'استعلاجی'
+                        break;
+                    default:
+                        return 'مقدار نامعبر'
+                        break;
+                }
+            },
+        },
         {
             field: 'createDate',
             type: 'date',
             headerName: 'تاریخ ثبت',
             headerAlign: 'left',
             minWidth: 120,
-            sortable: true,
             valueGetter: (params) => {
                 return new Date(params.value);
             },
@@ -122,7 +203,6 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     .format("jYYYY-jMM-jDD");
                 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
                 return date;
-
             },
         },
         {
@@ -162,8 +242,8 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             },
         },
         {
-            field: 'stauts',
-            type: 'string',
+            field: 'status',
+            type: 'singleSelect',
             headerName: 'وضعیت',
             headerAlign: 'left',
             minWidth: 120,
@@ -181,7 +261,6 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     default:
                         return 'مقدار نامعبر'
                         break;
-
                 }
             },
         },
@@ -193,10 +272,13 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             disableColumnMenu: true,
             minWidth: 160,
             renderCell: (params) => {
+
                 return (
                     <Box sx={{width: '100%'}}>
-                        <Button>تایید</Button>
                         <Button
+                            disabled={user.current.navBarUser().roll === 'manager' && params.status !== 'pending'}>تایید</Button>
+                        <Button
+                            disabled={user.current.navBarUser().roll === 'manager' && params.status !== 'pending'}
                             color={'error'}
                             onClick={(event) => acceptDeclineRequest(event, params.id, 'declined')}>رد</Button>
                     </Box>
@@ -208,8 +290,20 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
 
     return (
         <>
-            <DataGridPro
+            <StyledDataGrid
+                sx={{height: 420}}
+                initialState={{
+                    sorting: {
+                        sortModel: [{field: 'leaveFromDate', sort: 'asc'}],
+                    },
+                }}
                 {...data}
+                getRowClassName={(params) => {
+                    let momentDate = moment(params.row.leaveFromDate);
+                    let now = moment();
+                    let diff = abs(momentDate.diff(now, 'days'));
+                    return `app-theme-different--${diff}`;
+                }}
                 columns={columns}
                 checkboxSelection
                 filterModel={filterModel}
@@ -217,15 +311,13 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     setFilterModel(model)
                 }}
                 disableRowSelectionOnClick
-                sx={{}}
                 onRowSelectionModelChange={onSelectedRowsChanged}
                 onRowClick={(gridRowParams) => {
                     setModalInfoOpen(true);
                     setClickedRowParams(gridRowParams)
                 }}
             >
-            </DataGridPro>
-
+            </StyledDataGrid>
             <Modal
                 open={modalInfoOpen}
                 onClose={() => setModalInfoOpen(false)}>
@@ -233,12 +325,13 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     <h2 id="parent-modal-title">{'جزییات در خواست'}</h2>
                     <p id="parent-modal-description">
                         {clickedRowParams.row.description}
-
                     </p>
                     <Button
+                        disabled={user.current.navBarUser().roll === 'manager' && clickedRowParams.row.status !== 'pending'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
                     </Button>
                     <Button
+                        disabled={user.current.navBarUser().roll === 'manager' && clickedRowParams.row.status !== 'pending'}
                         color={'error'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
                     </Button>
