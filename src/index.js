@@ -25,6 +25,9 @@ import Api from "./Api";
 import ShowObjectionsManager from "./Pages/Objections/ShowObjectionsManager";
 import ShowObjections from "./Pages/Objections/ShowObjections";
 import Home from "./Pages/Home/Home";
+import Logout from "./Components/Logout";
+import ShowEmployees from "./Pages/Employees/ShowEmployees";
+import CreateEmployee from "./Pages/CreateEmployee/CreateEmployee";
 
 function handlePermission() {
 
@@ -93,6 +96,10 @@ const router = createBrowserRouter([
                 path: "/panel/objections",
                 element: <ProtectedRoute><ShowObjections/></ProtectedRoute>
             },
+            {
+                path: "/logout",
+                element: <ProtectedRoute><Logout/></ProtectedRoute>
+            },
 
             // Manager routes
             {
@@ -124,6 +131,13 @@ const router = createBrowserRouter([
                 </ProtectedRoute>,
             },
             {
+                path: "/panel/manager/objections",
+                element: <ProtectedRoute
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    <ShowObjectionsManager/>
+                </ProtectedRoute>
+            },
+            {
                 path: "/panel/manager/work-places",
                 element: <ProtectedRoute
                     requiredRoll={['managerAdministrativeAffairs']}>
@@ -131,10 +145,17 @@ const router = createBrowserRouter([
                 </ProtectedRoute>
             },
             {
-                path: "/panel/manager/objections",
+                path: "/panel/manager/employees",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
-                    <ShowObjectionsManager/>
+                    requiredRoll={['managerAdministrativeAffairs', 'expertAdministrativeAffairs']}>
+                    <ShowEmployees/>
+                </ProtectedRoute>
+            },
+            {
+                path: "/panel/manager/create-employee",
+                element: <ProtectedRoute
+                    requiredRoll={['managerAdministrativeAffairs']}>
+                    <CreateEmployee/>
                 </ProtectedRoute>
             },
         ],
