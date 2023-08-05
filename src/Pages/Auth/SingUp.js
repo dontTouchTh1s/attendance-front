@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
+import {useNavigate} from "react-router-dom";
 
 
 function SingUp() {
@@ -9,6 +10,7 @@ function SingUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cPassword, setCPassword] = useState('');
+    const navigate = useNavigate();
 
 
     async function handleSubmit(e) {
@@ -21,8 +23,8 @@ function SingUp() {
         formData.append("password", password);
 
         try {
-            const response = Api.post('/auth/register', formData);
-            console.log(response)
+            Api.post('/auth/register', formData);
+            navigate('/login');
             // handle successful response
         } catch (error) {
             if (error.response) {
@@ -51,7 +53,7 @@ function SingUp() {
                 alignItems: 'center'
             }}>
                 <Typography component="h1" variant="h4">
-                    ورود
+                    ثبت نام
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} noValidate>
                     <TextField
@@ -114,7 +116,8 @@ function SingUp() {
                         sx={{mt: 3, mb: 2}}
                         fullWidth
                         onClick={handleSubmit}
-                    >ورود
+                    >
+                        ثبت نام
                     </Button>
                 </Box>
             </Box>
