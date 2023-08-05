@@ -17,10 +17,9 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import {Link} from "react-router-dom";
 import CurrentPageContext from "../Contexts/CurrentPageContext";
+import HomeIcon from '@mui/icons-material/Home';
 
 const drawerWidth = 240;
 
@@ -89,13 +88,13 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
     }),
 );
 
-export default function MiniDrawer({pages, children}) {
+export default function MiniDrawer({pages, section, children}) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
     const [navBarCurrentPage, setNavBarCurrentPage] = useState('');
     const currentPage = useContext(CurrentPageContext);
     useEffect(() => {
-        currentPage.current = {page: navBarCurrentPage, set: setNavBarCurrentPage};
+        currentPage.current = {navBarCurrentPage, setNavBarCurrentPage};
     }, [])
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -158,7 +157,7 @@ export default function MiniDrawer({pages, children}) {
                                 >
                                     <ListItemIcon
                                         sx={{
-                                            color: currentPage.current.page === page.path ? 'blue' : '#0000008a',
+                                            color: navBarCurrentPage === page.path ? 'blue' : '#0000008a',
                                             minWidth: 0,
                                             mr: open ? 3 : 'auto',
                                             justifyContent: 'center',
@@ -168,7 +167,7 @@ export default function MiniDrawer({pages, children}) {
                                     </ListItemIcon>
                                     <ListItemText primary={page.title} sx={{
                                         opacity: open ? 1 : 0,
-                                        color: currentPage.current.page === page.path ? 'blue' : 'inherit'
+                                        color: navBarCurrentPage === page.path ? 'blue' : 'inherit'
                                     }}/>
                                 </ListItemButton>
                             </Link>
@@ -177,26 +176,42 @@ export default function MiniDrawer({pages, children}) {
                 </List>
                 <Divider/>
                 <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding sx={{display: 'block'}}>
-                            <ListItemButton
-                                sx={{
-                                    minHeight: 48,
-                                    justifyContent: open ? 'initial' : 'center',
-                                    px: 2.5,
+                    {section.map((page, index) => (
+                        <ListItem key={page.title} disablePadding sx={{display: 'block'}}>
+                            <Link
+                                onClick={() => {
+                                    setNavBarCurrentPage(page.path)
+                                }}
+                                to={page.path}
+                                style={{
+                                    textDecoration: 'none ',
+                                    color: "inherit"
                                 }}
                             >
-                                <ListItemIcon
+                                <ListItemButton
                                     sx={{
-                                        minWidth: 0,
-                                        mr: open ? 3 : 'auto',
-                                        justifyContent: 'center',
+
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5
                                     }}
                                 >
-                                    {index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}
-                                </ListItemIcon>
-                                <ListItemText primary={text} sx={{opacity: open ? 1 : 0}}/>
-                            </ListItemButton>
+                                    <ListItemIcon
+                                        sx={{
+                                            color: navBarCurrentPage === page.path ? 'blue' : '#0000008a',
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {page.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={page.title} sx={{
+                                        opacity: open ? 1 : 0,
+                                        color: navBarCurrentPage === page.path ? 'blue' : 'inherit'
+                                    }}/>
+                                </ListItemButton>
+                            </Link>
                         </ListItem>
                     ))}
                 </List>

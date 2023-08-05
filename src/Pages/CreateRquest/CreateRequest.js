@@ -98,8 +98,6 @@ function CreateLeaveRequest() {
                                 >
                                     <MenuItem value={'paid'}>استحقاقی</MenuItem>
                                     <MenuItem value={'sick'}>استعلاجی</MenuItem>
-                                    <MenuItem value={'noPaid'}>بدون حقوق</MenuItem>
-                                    <MenuItem value={'optional'}>انتخابی</MenuItem>
                                 </Select>
                             </FormControl>
                         </Grid>

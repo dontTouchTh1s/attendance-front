@@ -28,7 +28,7 @@ function ShowAttendanceLeavesManager() {
     return (
         <Box>
             <Typography component="h1" variant="h4" sx={{marginTop: '8px'}}>
-                ورود و خروج کارکنان
+                ورود و خروج
             </Typography>
             <Typography component='p' sx={{marginTop: '8px'}}>
                 در این بخش میتوانید ورود و خروج ثبت شده خود را مشاهده کنید، در صورت خطا در اطلاعات ثبت شده میتوانید به

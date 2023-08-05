@@ -70,10 +70,10 @@ function CreatePenaltyCondition() {
     }
 
     useEffect(() => {
-        fetchWorkPlaces();
+        fetchGroupPolicies();
     }, [])
 
-    async function fetchWorkPlaces() {
+    async function fetchGroupPolicies() {
         try {
             const response = await Api.get('/group-policies');
             // handle successful response

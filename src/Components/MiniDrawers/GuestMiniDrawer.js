@@ -6,6 +6,7 @@ import {Outlet} from "react-router-dom";
 import React from "react";
 import LoginIcon from "@mui/icons-material/Login";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
+import HomeIcon from "@mui/icons-material/Home";
 
 function GuestMiniDrawer() {
     return (
@@ -20,6 +21,13 @@ function GuestMiniDrawer() {
                     path: '/sing-up',
                     title: 'ثبت نام',
                     icon: <AppRegistrationIcon/>
+                },
+            ]}
+            section={[
+                {
+                    path: '/',
+                    title: 'صفحه اصلی',
+                    icon: <HomeIcon/>
                 },
             ]}
         >

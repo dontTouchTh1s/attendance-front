@@ -52,6 +52,7 @@ function LeaveRequests() {
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     useEffect(() => {
         fetchRequests();
+        console.log('fetching')
     }, [])
 
     function handleSelectedRowsChanged(value) {
@@ -85,6 +86,7 @@ function LeaveRequests() {
             }
         }
         await fetchRequests();
+        setSelectedRows([]);
     }
 
     async function requestModifyHandler() {

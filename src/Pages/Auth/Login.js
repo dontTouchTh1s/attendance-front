@@ -19,14 +19,17 @@ function Login() {
 
         try {
             const response = await Api.post('/auth/login', formData);
-            navigate('/panel');
-            // handle successful response
-            localStorage.setItem('name', response.data['name']);
-            localStorage.setItem('email', response.data['email']);
-            let location = JSON.parse(response.data['workPlace']['location']);
-            localStorage.setItem('lat', location['lat']);
-            localStorage.setItem('lng', location['lng']);
-            localStorage.setItem('radius', response.data['workPlace']['radius']);
+
+            if (response.status === 200) {
+                navigate('/panel');
+                // handle successful response
+                localStorage.setItem('name', response.data['name']);
+                localStorage.setItem('email', response.data['email']);
+                let location = JSON.parse(response.data['workPlace']['location']);
+                localStorage.setItem('lat', location['lat']);
+                localStorage.setItem('lng', location['lng']);
+                localStorage.setItem('radius', response.data['workPlace']['radius']);
+            }
         } catch (error) {
             if (error.response) {
                 // handle error response
@@ -39,7 +42,6 @@ function Login() {
                 console.log('Error', error.message);
             }
         }
-
     }
 
     return (
