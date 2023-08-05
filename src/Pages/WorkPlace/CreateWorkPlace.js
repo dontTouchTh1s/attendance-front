@@ -3,26 +3,29 @@ import React, {useState} from 'react'
 import Api from "../../Api";
 import {Box, Button, TextField, Typography,} from "@mui/material";
 
+const defaultLocation = {lat: 32.6539, lng: 51.6660};
+const defaultZoom = 10;
+
 function CreateWorkPlace() {
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
-    const [lat, setLat] = useState(0);
-    const [lng, setLng] = useState(0);
     const [radius, setRadius] = useState(0);
+    const [location, setLocation] = useState(defaultLocation);
+    const [zoom, setZoom] = useState(defaultZoom);
 
-    async function handleSubmitWorkPlace(e) {
-        e.preventDefault();
+
+    async function handleSubmitWorkPlace() {
         // Insert new work place to database
-        let formData = new FormData();
-        formData.append('name', name);
-        formData.append('address', address);
-        formData.append('radius', radius);
-        formData.append('lat', lat);
-        formData.append('lng', lng);
 
-
+        let data = {
+            'name': name,
+            'address': address,
+            'radius': radius,
+            'lat': location.lat,
+            'lng': location.lng
+        }
         try {
-            const response = await Api.post('/work-places/create', formData);
+            const response = await Api.post('/work-places/create', {...data});
             console.log(response);
             // handle successful response
 
@@ -41,9 +44,13 @@ function CreateWorkPlace() {
 
     }
 
+
     function handleChangeLocation(lat, lng) {
-        setLat(lat);
-        setLng(lng);
+        setLocation({lat: lat, lng: lng});
+    }
+
+    function handleChangeZoom(newZoom) {
+        setZoom(newZoom);
     }
 
     return (
@@ -91,7 +98,6 @@ function CreateWorkPlace() {
 
 
                     <Button
-                        type={'submit'}
                         variant="contained"
                         sx={{mt: 3, mb: 2}}
                         onClick={handleSubmitWorkPlace}
@@ -101,9 +107,14 @@ function CreateWorkPlace() {
                 </Box>
                 <Box sx={{width: '100%'}}>
                     <GoogleMap
-                        onChangeLocation={handleChangeLocation}>
+                        defaultLocation={location}
+                        zoom={zoom}
+                        mapTypeId="roadmap"
+                        style={{height: '700px'}}
+                        onChangeLocation={handleChangeLocation}
+                        onChangeZoom={handleChangeZoom}
+                        apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'/>
 
-                    </GoogleMap>
                 </Box>
             </Box>
         </Box>
