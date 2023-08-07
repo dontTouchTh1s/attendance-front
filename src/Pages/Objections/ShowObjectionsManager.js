@@ -17,7 +17,6 @@ function ShowObjectionsManager() {
     async function fetchObjections() {
         const response = await Api.get('/objections/');
         // handle successful response
-        console.log(response.data)
         let data = response.data.data;
         setObjections({
             rows: data
@@ -38,7 +37,7 @@ function ShowObjectionsManager() {
                 در این بخش اعتراضات کارمندان مروبط به اطلاعات ورود خروج آنها را میتوانید مشاهده کنید.
 
             </Typography>
-            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
 
                 <ObjectionDataGrid
                     onModifyObjection={handleModifyObjections}

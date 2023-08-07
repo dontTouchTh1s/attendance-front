@@ -1,6 +1,6 @@
 import {DataGridPro, GridColDef, GridLogicOperator} from "@mui/x-data-grid-pro";
 import React, {useContext, useEffect, useState} from "react";
-import {Box, Button, darken, lighten, Modal} from "@mui/material";
+import {Box, Button, Modal} from "@mui/material";
 import moment from "moment-jalaali";
 import Api from "../../Api";
 import {styled} from "@mui/material/styles";
@@ -148,19 +148,9 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
 
         try {
             const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
-            console.log(response);
             // handle successful response
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
         setModalInfoOpen(false);
         onModifyRequest();

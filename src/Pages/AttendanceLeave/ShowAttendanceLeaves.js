@@ -14,7 +14,6 @@ function ShowAttendanceLeavesManager() {
         async function getAttendanceLeaves() {
             const response = await Api.get('/attendance-leaves/user');
             // handle successful response
-            console.log(response)
             let data = response.data;
             setAttendanceLeaves({
                 rows: data
@@ -34,7 +33,7 @@ function ShowAttendanceLeavesManager() {
                 در این بخش میتوانید ورود و خروج ثبت شده خود را مشاهده کنید، در صورت خطا در اطلاعات ثبت شده میتوانید به
                 آنها اعتراض کنید تا توسط مدیر بررسی شود.
             </Typography>
-            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
 
                 <AttendanceLeaveDataGrid
                     data={attendanceLeaves}>

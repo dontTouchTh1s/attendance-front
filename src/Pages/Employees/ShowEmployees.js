@@ -13,7 +13,6 @@ function ShowEmployees() {
         async function getEmployees() {
             const response = await Api.get('/employees');
             // handle successful response
-            console.log(response)
             let data = response.data.data;
             setEmployees({
                 rows: data
@@ -33,7 +32,7 @@ function ShowEmployees() {
                 در این بخش میتوانید کارمندان شرکت را مشاهده کنید.
 
             </Typography>
-            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
 
                 <EmployeesDataGrid
                     data={employees}>

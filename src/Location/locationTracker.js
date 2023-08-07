@@ -39,18 +39,8 @@ export default function locationTracker(geoOptions) {
                     data.append('type', 'leave');
                     let response = await Api.post('attendance-leave/create', data);
                     localStorage.setItem('employeeStatus', 'out');
-                    console.log(response);
                 } catch (error) {
-                    if (error.response) {
-                        // handle error response
-                        console.log(error.response.data);
-                    } else if (error.request) {
-                        // handle no response
-                        console.log(error.request);
-                    } else {
-                        // handle other errors
-                        console.log('Error', error.message);
-                    }
+
                 }
             }
         } else {
@@ -63,18 +53,8 @@ export default function locationTracker(geoOptions) {
                     data.append('type', 'attendance');
                     let response = await Api.post('attendance-leave/create', data);
                     localStorage.setItem('employeeStatus', 'in');
-                    console.log(response);
                 } catch (error) {
-                    if (error.response) {
-                        // handle error response
-                        console.log(error.response.data);
-                    } else if (error.request) {
-                        // handle no response
-                        console.log(error.request);
-                    } else {
-                        // handle other errors
-                        console.log('Error', error.message);
-                    }
+
                 }
             }
         }

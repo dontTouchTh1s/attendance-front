@@ -14,7 +14,6 @@ function ShowObjections() {
         async function fetchObjections() {
             const response = await Api.get('/objections/user');
             // handle successful response
-            console.log(response.data)
             let data = response.data.data;
             setObjections({
                 rows: data
@@ -34,7 +33,7 @@ function ShowObjections() {
                 در این بخش میتوانید اعتراضات خود را مشاهده کنید.
 
             </Typography>
-            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
 
                 <UserObjectionDataGrid
                     data={objections}>

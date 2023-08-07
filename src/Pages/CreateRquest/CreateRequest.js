@@ -34,35 +34,27 @@ function CreateLeaveRequest() {
 
     async function handleSubmit(e) {
         e.preventDefault();
-
-        let formData = new FormData();
-        formData.append('type', 'leave');
-        formData.append('leave_type', type);
-        formData.append('from_date', dateRange[0].format('YYYY-MM-DD'));
-        formData.append('to_date', dateRange[1].format('YYYY-MM-DD'));
-        formData.append('description', description);
+        let fromDate = moment(dateRange[0]);
+        let toDate = leaveTimingType === 'hourly' ? fromDate.add(1, 'days') : dateRange[1];
+        let data = {
+            'type': 'leave',
+            'leave_type': type,
+            'from_date': dateRange[0].format('jYYYY-jMM-jDD'),
+            'to_date': toDate.format('jYYYY-jMM-jDD'),
+            'description': description
+        };
 
         if (leaveTimingType === 'hourly') {
-            formData.append('from_hour', (fromHour.format('HH:mm:ss')));
-            formData.append('to_hour', (toHour.format('HH:mm:ss')));
+            data.from_hour = fromHour.format('HH:mm:ss');
+            data.to_hour = toHour.format('HH:mm:ss');
         }
 
 
         try {
-            const response = await Api.post('/requests/create', formData);
+            const response = await Api.post('/requests/create', data);
             // handle successful response
-            console.log(response);
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+            console.log(error)
         }
 
     }

@@ -105,7 +105,7 @@ const router = createBrowserRouter([
             {
                 path: "/panel/manager/leave-requests",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
                     <LeaveRequests/>
                 </ProtectedRoute>
             },
@@ -119,42 +119,42 @@ const router = createBrowserRouter([
             {
                 path: "/panel/manager/create-group-policy",
                 element: <ProtectedRoute
-                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
                     <CreateGroupPolicy/>
                 </ProtectedRoute>,
             },
             {
                 path: "/panel/manager/create-penalty-condition",
                 element: <ProtectedRoute
-                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
                     <CreatePenaltyCondition/>
                 </ProtectedRoute>,
             },
             {
                 path: "/panel/manager/objections",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
                     <ShowObjectionsManager/>
                 </ProtectedRoute>
             },
             {
                 path: "/panel/manager/work-places",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs']}>
+                    requiredRoll={['managerAdministrativeAffairs', 'superAdmin']}>
                     <CreateWorkPlace/>
                 </ProtectedRoute>
             },
             {
                 path: "/panel/manager/employees",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs', 'expertAdministrativeAffairs']}>
+                    requiredRoll={['managerAdministrativeAffairs', 'expertAdministrativeAffairs', 'superAdmin']}>
                     <ShowEmployees/>
                 </ProtectedRoute>
             },
             {
                 path: "/panel/manager/create-employee",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs']}>
+                    requiredRoll={['managerAdministrativeAffairs', 'superAdmin']}>
                     <CreateEmployee/>
                 </ProtectedRoute>
             },

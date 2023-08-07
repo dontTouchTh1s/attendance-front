@@ -52,19 +52,9 @@ function CreatePenaltyCondition() {
         };
         try {
             const response = await Api.post('/penalty-conditions/create', data);
-            console.log(response);
             // handle successful response
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
 
     }
@@ -80,16 +70,7 @@ function CreatePenaltyCondition() {
             setGroupPolicies(response.data);
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
     }
 

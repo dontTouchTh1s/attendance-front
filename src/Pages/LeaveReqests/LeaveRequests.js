@@ -52,7 +52,6 @@ function LeaveRequests() {
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     useEffect(() => {
         fetchRequests();
-        console.log('fetching')
     }, [])
 
     function handleSelectedRowsChanged(value) {
@@ -71,19 +70,9 @@ function LeaveRequests() {
 
         try {
             const response = await Api.post('/requests/', {...data, _method: 'patch'});
-            console.log(response);
             // handle successful response
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
         await fetchRequests();
         setSelectedRows([]);
@@ -97,7 +86,6 @@ function LeaveRequests() {
         try {
             const response = await Api.get('/requests');
             // handle successful response
-            console.log(response)
             let data = response.data.data;
             setData({
                 rows: data
@@ -105,16 +93,7 @@ function LeaveRequests() {
 
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
     }
 

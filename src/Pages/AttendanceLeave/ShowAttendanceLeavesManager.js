@@ -13,7 +13,6 @@ function ShowAttendanceLeavesManager() {
         async function getAttendanceLeaves() {
             const response = await Api.get('/attendance-leaves/');
             // handle successful response
-            console.log(response)
             let data = response.data;
             setAttendanceLeaves({
                 rows: data
@@ -32,7 +31,7 @@ function ShowAttendanceLeavesManager() {
                 زمان ورود و خروج کارکنان در جدول زیر نمایش داده شده است. در صورت خطا یا تداخل میتوانید آنها را به صورت
                 دستی ویرایش کنید.
             </Typography>
-            <Container disableGutters sx={{py: {sx: 1, md: 2}}}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
                 <AttendanceLeaveDataGridManager
                     data={attendanceLeaves}>
                 </AttendanceLeaveDataGridManager>

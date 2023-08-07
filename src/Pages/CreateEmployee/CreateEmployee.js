@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import {
     Box,
@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Api from "../../Api";
+import UserContext from "../../Contexts/UserContext";
 
 function CreatePenaltyCondition() {
     const [firstName, setFirstName] = useState();
@@ -24,6 +25,8 @@ function CreatePenaltyCondition() {
     const [manager, setManager] = useState('');
     const [groupPolicies, setGroupPolicies] = useState([]);
     const [employees, setEmployees] = useState([]);
+    const [roll, setRoll] = useState('');
+    const user = useContext(UserContext);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -35,21 +38,13 @@ function CreatePenaltyCondition() {
             'manager_id': manager,
             'group_policy_id': groupPolicy
         };
+        if (roll !== '')
+            data.roll = roll;
         try {
             const response = await Api.post('/employees/create', data);
-            console.log(response);
             // handle successful response
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
 
     }
@@ -66,16 +61,7 @@ function CreatePenaltyCondition() {
             setGroupPolicies(response.data);
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
     }
 
@@ -86,16 +72,7 @@ function CreatePenaltyCondition() {
             setEmployees(response.data.data);
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
     }
 
@@ -184,9 +161,29 @@ function CreatePenaltyCondition() {
                             </Select>
                         </FormControl>
                     </Grid>
+                    {
+                        user.current.navBarUser().roll === 'superAdmin' ?
+                            <Grid sm={6} xs={12}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="roll-label">نقش</InputLabel>
+                                    <Select
+                                        autoWidth
+                                        labelId="roll-label"
+                                        value={roll}
+                                        onChange={(e) => setRoll(e.target.value)}
+                                        label="نقش"
+                                    >
+                                        <MenuItem
+                                            value={'expertAdministrativeAffairs'}>{'کارشناس امور اداری'}</MenuItem>
+                                        <MenuItem value={'managerAdministrativeAffairs'}>{'مدیر امور اداری'}</MenuItem>
+                                        <MenuItem value={'employee'}>{'کارمند'}</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid> : null
+                    }
 
 
-                    <Grid xs={12} sm={6} md={4}>
+                    <Grid xs={12} sm={7}>
                         <Button
                             type="submit"
                             variant="contained"

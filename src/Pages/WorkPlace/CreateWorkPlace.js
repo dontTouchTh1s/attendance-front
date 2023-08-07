@@ -26,20 +26,10 @@ function CreateWorkPlace() {
         }
         try {
             const response = await Api.post('/work-places/create', {...data});
-            console.log(response);
             // handle successful response
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
 
     }

@@ -14,7 +14,6 @@ function ProtectedRoute({requiredRoll, children}) {
         try {
             let response = await Api.get('/auth/');
             user.current.setNavBarUser(response.data);
-            console.log(response)
             setChecked(true);
             if (requiredRoll !== undefined) {
                 if (!requiredRoll.includes(response.data.roll)) {
@@ -30,12 +29,6 @@ function ProtectedRoute({requiredRoll, children}) {
                     user.current.setNavBarUser({});
                     navigate('/login');
                 }
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
             }
         }
     }

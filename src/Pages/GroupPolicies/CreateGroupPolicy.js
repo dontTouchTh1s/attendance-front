@@ -40,18 +40,8 @@ function CreateGroupPolicy() {
         try {
             const response = await Api.post('/group-policies/create', data);
             // handle successful response
-            console.log(response);
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
 
     }
@@ -64,20 +54,10 @@ function CreateGroupPolicy() {
         try {
             const response = await Api.get('/work-places');
             // handle successful response
-            console.log(response);
             setWorkPlaces(response.data);
 
         } catch (error) {
-            if (error.response) {
-                // handle error response
-                console.log(error.response.data);
-            } else if (error.request) {
-                // handle no response
-                console.log(error.request);
-            } else {
-                // handle other errors
-                console.log('Error', error.message);
-            }
+
         }
     }
 
