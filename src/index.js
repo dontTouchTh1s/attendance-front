@@ -1,4 +1,3 @@
-import React, {StrictMode} from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
@@ -28,6 +27,12 @@ import Home from "./Pages/Home/Home";
 import Logout from "./Components/Logout";
 import ShowEmployees from "./Pages/Employees/ShowEmployees";
 import CreateEmployee from "./Pages/CreateEmployee/CreateEmployee";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://cra.link/PWA
+serviceWorkerRegistration.register();
 
 function handlePermission() {
 
@@ -163,9 +168,7 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <StrictMode>
-        <RouterProvider router={router}/>
-    </StrictMode>
+    <RouterProvider router={router}/>
 );
 
 // If you want to start measuring performance in your app, pass a function
