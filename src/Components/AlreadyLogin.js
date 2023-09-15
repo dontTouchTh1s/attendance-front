@@ -20,7 +20,7 @@ function AlreadyLogin({children}) {
                 }
                 setChecked(true);
             } catch (error) {
-
+                console.log('error');
                 setChecked(true);
             }
         }

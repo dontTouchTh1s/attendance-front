@@ -1,7 +1,9 @@
 import GoogleMap from "../../Components/Map/GoogleMap";
 import React, {useState} from 'react'
 import Api from "../../Api";
-import {Box, Button, TextField, Typography,} from "@mui/material";
+import {Box, Container, InputAdornment, TextField, Typography,} from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const defaultLocation = {lat: 32.6539, lng: 51.6660};
 const defaultZoom = 10;
@@ -12,11 +14,17 @@ function CreateWorkPlace() {
     const [radius, setRadius] = useState(0);
     const [location, setLocation] = useState(defaultLocation);
     const [zoom, setZoom] = useState(defaultZoom);
-
+    const [nameError, setNameError] = useState('');
+    const [addressError, setAddressError] = useState('');
+    const [radiusError, setRadiusError] = useState('');
+    const [createWorkPlaceLoading, setCreateWorkPlaceLoading] = useState(false);
 
     async function handleSubmitWorkPlace() {
         // Insert new work place to database
-
+        handleRadiusError();
+        handleAddressError();
+        if (radiusError || addressError || nameError)
+            return;
         let data = {
             'name': name,
             'address': address,
@@ -24,12 +32,15 @@ function CreateWorkPlace() {
             'lat': location.lat,
             'lng': location.lng
         }
+
         try {
-            const response = await Api.post('/work-places/create', {...data});
+            setCreateWorkPlaceLoading(true);
+            await Api.post('/work-places/create', {...data});
+            setCreateWorkPlaceLoading(false);
+
             // handle successful response
-
         } catch (error) {
-
+            setCreateWorkPlaceLoading(false);
         }
 
     }
@@ -43,6 +54,31 @@ function CreateWorkPlace() {
         setZoom(newZoom);
     }
 
+    function handleRadiusError(value) {
+        const regex = new RegExp('^\\d+$');
+        if (regex.test(value) && value !== '0') {
+            setRadiusError('');
+        } else {
+            setRadiusError('لطفا شعاع معتبر وارد کنید.');
+        }
+    }
+
+    function handleNameError(value) {
+        if (value === '') {
+            setNameError('لطفا این فیلد را پر کنید.');
+        } else {
+            setNameError('');
+        }
+    }
+
+    function handleAddressError(value) {
+        if (value === '') {
+            setAddressError('لطفا این فیلد را پر کنید.');
+        } else {
+            setAddressError('');
+        }
+    }
+
     return (
         <Box>
             <Typography component="h1" variant="h4" sx={{marginTop: '8px'}}>
@@ -52,61 +88,87 @@ function CreateWorkPlace() {
                 برای اضافه کردن محل کار جدید، مکان آن روی نقشه را به صورت دقیق انتخاب کنید و شعاع مساحت محل کار را به
                 صورت تقریبی وارد کنید.
             </Typography>
-            <Box component={'form'} noValidate onSubmit={handleSubmitWorkPlace}
-                 sx={{
-                     display: 'flex',
-                     justifyContent: 'space-between',
-                     gap: '16px',
-                     padding: '16px 0'
-                 }}>
-                <Box sx={{
-                    display: 'flex',
-                    gap: '12px',
-                    flexDirection: 'column',
-                    minWidth: '40%'
-                }}>
-                    <TextField
-                        label={'نام'}
-                        value={name}
-                        onChange={newValue => setName(newValue.target.value)}
-                    >
-                    </TextField>
-                    <TextField
-                        label={'آدرس'}
-                        value={address}
-                        onChange={newValue => setAddress(newValue.target.value)}
-                        multiline
-                        minRows={2}
-                    >
-                    </TextField>
-                    <TextField
-                        label={'شعاع'}
-                        value={radius}
-                        onChange={newValue => setRadius(newValue.target.value)}
-                    >
-                    </TextField>
-
-
-                    <Button
-                        variant="contained"
-                        sx={{mt: 3, mb: 2}}
-                        onClick={handleSubmitWorkPlace}
-                    >
-                        ثبت
-                    </Button>
-                </Box>
-                <Box sx={{width: '100%'}}>
-                    <GoogleMap
-                        defaultLocation={location}
-                        zoom={zoom}
-                        mapTypeId="roadmap"
-                        style={{height: '700px'}}
-                        onChangeLocation={handleChangeLocation}
-                        onChangeZoom={handleChangeZoom}
-                        apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'/>
-
-                </Box>
-            </Box>
+            <Container disableGutters maxWidth={'xl'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+                <Grid container spacing={{xs: 2, md: 3}}>
+                    <Grid xs={12} md={5}>
+                        <Box>
+                            <Grid container spacing={{xs: 2, md: 3}}>
+                                <Grid xs={12}>
+                                    <TextField
+                                        onBlur={handleNameError}
+                                        helperText={nameError}
+                                        error={nameError !== ''}
+                                        autoFocus
+                                        fullWidth
+                                        label={'نام'}
+                                        value={name}
+                                        onChange={e => {
+                                            setName(e.target.value);
+                                            handleNameError(e.target.value);
+                                        }}
+                                    >
+                                    </TextField>
+                                </Grid>
+                                <Grid xs={12}>
+                                    <TextField
+                                        onBlur={handleAddressError}
+                                        helperText={addressError}
+                                        error={addressError !== ''}
+                                        label={'آدرس'}
+                                        value={address}
+                                        fullWidth
+                                        onChange={e => {
+                                            setAddress(e.target.value);
+                                            handleAddressError(e.target.value);
+                                        }}
+                                        multiline
+                                        minRows={4}
+                                    >
+                                    </TextField>
+                                </Grid>
+                                <Grid xs={12}>
+                                    <TextField
+                                        onBlur={handleRadiusError}
+                                        error={radiusError !== ''}
+                                        helperText={radiusError}
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position="start">متر</InputAdornment>,
+                                        }}
+                                        label={'شعاع'}
+                                        value={radius}
+                                        onChange={e => {
+                                            setRadius(e.target.value);
+                                            handleRadiusError(e.target.value);
+                                        }}
+                                    >
+                                    </TextField>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Grid>
+                    <Grid xs={12} md={7}>
+                        <GoogleMap
+                            defaultLocation={location}
+                            zoom={zoom}
+                            mapTypeId="roadmap"
+                            style={{height: '700px'}}
+                            onChangeLocation={handleChangeLocation}
+                            onChangeZoom={handleChangeZoom}
+                            apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'/>
+                    </Grid>
+                    <Grid xs={12} md={5}>
+                        <LoadingButton
+                            loading={createWorkPlaceLoading}
+                            fullWidth
+                            variant="contained"
+                            onClick={handleSubmitWorkPlace}
+                        >
+                            ثبت
+                        </LoadingButton>
+                    </Grid>
+                </Grid>
+            </Container>
         </Box>
     )
 }

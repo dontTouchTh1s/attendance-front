@@ -4,7 +4,7 @@ import {
     Box,
     Button,
     Container,
-    FormControl,
+    FormControl, FormHelperText,
     InputLabel,
     MenuItem,
     Paper,
@@ -15,6 +15,7 @@ import {
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Api from "../../Api";
 import UserContext from "../../Contexts/UserContext";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 function CreatePenaltyCondition() {
     const [firstName, setFirstName] = useState();
@@ -25,11 +26,27 @@ function CreatePenaltyCondition() {
     const [manager, setManager] = useState('');
     const [groupPolicies, setGroupPolicies] = useState([]);
     const [employees, setEmployees] = useState([]);
-    const [roll, setRoll] = useState('');
+    const [roll, setRoll] = useState('employee');
+
+    const [firstNameError, setFirstNameError] = useState('');
+    const [lastNameError, setLastNameError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [groupPolicyError, setGroupPolicyError] = useState('');
+    const [createEmployeeLoading, setCreateEmployeeLoading] = useState(false);
+
     const user = useContext(UserContext);
 
     async function handleSubmit(e) {
         e.preventDefault();
+        handleEmailError(email);
+        handleFirstNameError(firstName);
+        handleLastNameError(lastName);
+        handlePasswordError(password)
+        handleGroupPolicyError(groupPolicy);
+        if (emailError || firstNameError || lastNameError || passwordError || groupPolicyError) {
+            return;
+        }
         let data = {
             'first_name': firstName,
             'last_name': lastName,
@@ -41,10 +58,12 @@ function CreatePenaltyCondition() {
         if (roll !== '')
             data.roll = roll;
         try {
-            const response = await Api.post('/employees/create', data);
+            setCreateEmployeeLoading(true);
+            await Api.post('/employees/create', data);
+            setCreateEmployeeLoading(false);
             // handle successful response
         } catch (error) {
-
+            setCreateEmployeeLoading(false);
         }
 
     }
@@ -76,6 +95,47 @@ function CreatePenaltyCondition() {
         }
     }
 
+    function handleEmailError(value) {
+        const regex = new RegExp('^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
+        if (!regex.test(value)) {
+            setEmailError('لطفا یک ایمیل معتبر وارد کنید.');
+        } else {
+            setEmailError('');
+        }
+    }
+
+    function handleFirstNameError(value) {
+        let regex = /^[\u0600-\u06FF\s]+$/;
+        if (!regex.test(value)) {
+            setFirstNameError('لطفا یک نام معتبر وارد کنید.');
+        } else {
+            setFirstNameError('');
+        }
+    }
+
+    function handleLastNameError(value) {
+        let regex = /^[\u0600-\u06FF\s]+$/;
+        if (!regex.test(value)) {
+            setLastNameError('لطفا یک نام خانوادگی معتبر وارد کنید.');
+        } else {
+            setLastNameError('');
+        }
+    }
+
+    function handlePasswordError(value) {
+        if (value.length < 8) {
+            setPasswordError('رمز عبور حداقل 8 باید باشد.');
+        } else {
+            setPasswordError('');
+        }
+    }
+
+    function handleGroupPolicyError(value) {
+        if (value === '')
+            setGroupPolicyError('لطفا یک گروه سیاست کاری انتخاب کنید.');
+        else
+            setGroupPolicyError('');
+    }
 
     return (
         <Box>
@@ -92,39 +152,67 @@ function CreatePenaltyCondition() {
                     <Grid sm={6} xs={12}>
                         <TextField
                             fullWidth
+                            error={firstNameError !== ''}
+                            helperText={firstNameError}
                             value={firstName}
-                            onChange={(e) => setFirstName(e.target.value)}
+                            onBlur={(e) => handleFirstNameError(e.target.value)}
+                            onChange={(e) => {
+                                setFirstName(e.target.value);
+                                handleFirstNameError(e.target.value)
+                            }}
                             placeholder={'نام'}
                             label={'نام'}
+                            required
                         >
                         </TextField>
                     </Grid>
                     <Grid sm={6} xs={12}>
                         <TextField
+                            error={lastNameError !== ''}
+                            helperText={lastNameError}
                             fullWidth
                             value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
+                            onBlur={(e) => handleLastNameError(e.target.value)}
+                            onChange={(e) => {
+                                setLastName(e.target.value)
+                                handleLastNameError(e.target.value);
+                            }}
                             label={'نام خانوادگی'}
+                            required
                         >
                         </TextField>
                     </Grid>
                     <Grid sm={6} xs={12}>
                         <TextField
+                            error={emailError !== ''}
+                            helperText={emailError}
                             fullWidth
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onBlur={(e) => handleEmailError(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                handleEmailError(e.target.value);
+                            }}
                             placeholder={'ایمیل'}
                             label={'ایمیل'}
+                            required
                         >
                         </TextField>
                     </Grid>
                     <Grid sm={6} xs={12}>
                         <TextField
+                            error={passwordError !== ''}
+                            helperText={passwordError}
                             fullWidth
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onBlur={(e) => handlePasswordError(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                handlePasswordError(e.target.value);
+                            }}
                             placeholder={'رمز عبور'}
                             label={'رمز عبور'}
+                            required
                         >
                         </TextField>
                     </Grid>
@@ -132,17 +220,24 @@ function CreatePenaltyCondition() {
                         <FormControl fullWidth>
                             <InputLabel id="group-policy-label">گروه سیاست کاری</InputLabel>
                             <Select
+                                error={groupPolicyError !== ''}
                                 autoWidth
                                 labelId="group-policy-label"
                                 value={groupPolicy}
-                                onChange={(e) => setGroupPolicy(e.target.value)}
+                                onBlur={(e) => handleGroupPolicyError(e.target.value)}
+                                onChange={(e) => {
+                                    setGroupPolicy(e.target.value);
+                                    handleGroupPolicyError(e.target.value);
+                                }}
                                 label="گروه سیاست کاری"
+                                required
                             >
                                 {groupPolicies.map(gp =>
                                     <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
                                 )}
 
                             </Select>
+                            <FormHelperText error={groupPolicyError !== ''}>{groupPolicyError}</FormHelperText>
                         </FormControl>
                     </Grid>
                     <Grid sm={6} xs={12}>
@@ -159,10 +254,12 @@ function CreatePenaltyCondition() {
                                     <MenuItem key={e.id} value={e.id}>{e.name}</MenuItem>
                                 )}
                             </Select>
+                            <FormHelperText>اختیاری</FormHelperText>
+
                         </FormControl>
                     </Grid>
                     {
-                        user.current.navBarUser().roll === 'superAdmin' ?
+                        user.current.navBarUser.roll === 'superAdmin' ?
                             <Grid sm={6} xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel id="roll-label">نقش</InputLabel>
@@ -184,14 +281,15 @@ function CreatePenaltyCondition() {
 
 
                     <Grid xs={12} sm={7}>
-                        <Button
+                        <LoadingButton
+                            loading={createEmployeeLoading}
                             type="submit"
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                             fullWidth
                             onClick={handleSubmit}
                         >ایجاد
-                        </Button>
+                        </LoadingButton>
                     </Grid>
                 </Grid>
             </Container>

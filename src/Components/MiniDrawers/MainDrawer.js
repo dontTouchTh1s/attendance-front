@@ -23,13 +23,9 @@ function MainDrawer() {
         } else return <GuestMiniDrawer/>
     }
 
-    function getNavBarUser() {
-        return navBarUser;
-    }
-
     useEffect(() => {
-        user.current = {navBarUser: getNavBarUser, setNavBarUser};
-    }, []);
+        user.current = {navBarUser, setNavBarUser};
+    }, [navBarUser, user]);
     return (
         <>
             {

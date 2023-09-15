@@ -28,6 +28,7 @@ import Logout from "./Components/Logout";
 import ShowEmployees from "./Pages/Employees/ShowEmployees";
 import CreateEmployee from "./Pages/CreateEmployee/CreateEmployee";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import {StrictMode} from "react";
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
@@ -117,7 +118,7 @@ const router = createBrowserRouter([
             {
                 path: "/panel/manager/attendance-leaves",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs']}>
+                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
                     <ShowAttendanceLeavesManager/>
                 </ProtectedRoute>,
             },
@@ -168,7 +169,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
+    //<StrictMode>
     <RouterProvider router={router}/>
+    //</StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

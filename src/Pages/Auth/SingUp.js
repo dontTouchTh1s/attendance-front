@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {Box, Button, Container, CssBaseline, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
 import {useNavigate} from "react-router-dom";
+import Grid from "@mui/material/Unstable_Grid2";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 
 function SingUp() {
@@ -10,6 +12,7 @@ function SingUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cPassword, setCPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
 
@@ -23,96 +26,90 @@ function SingUp() {
         formData.append("password", password);
 
         try {
-            Api.post('/auth/register', formData);
+            setLoading(true);
+            await Api.post('/auth/register', formData);
+            setLoading(false);
             navigate('/login');
             // handle successful response
         } catch (error) {
 
         }
-
-        // handle successful registration here
-
     }
 
     return (
-        <Container component={"main"} maxWidth={"xs"}>
+        <Box>
             <CssBaseline/>
-            <Box sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-            }}>
-                <Typography component="h1" variant="h4">
-                    ثبت نام
-                </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate>
-                    <TextField
-                        type="name"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="name"
-                        label="نام"
-                        name="نام"
-                        autoComplete="name"
-                        autoFocus
-                        onChange={(e) => {
-                            setName(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        type="email"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="ایمیل"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        onChange={(e) => {
-                            setEmail(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="رمز عبود"
-                        type="password"
-                        id="password"
-                        autoComplete="new-password"
-                        onChange={(e) => {
-                            setPassword(e.target.value)
-                        }}
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="cPassword"
-                        label="تکرار رمز عبور"
-                        type="text"
-                        id="cPassword"
-                        autoComplete="new-password"
-                        onChange={(e) => {
-                            setCPassword(e.target.value)
-                        }}
-                    />
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        sx={{mt: 3, mb: 2}}
-                        fullWidth
-                        onClick={handleSubmit}
-                    >
-                        ثبت نام
-                    </Button>
-                </Box>
-            </Box>
-        </Container>
+            <Typography component="h1" variant="h4" sx={{textAlign: 'center'}}>
+                ثبت نام
+            </Typography>
+            <Container disableGutters maxWidth={'xs'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+                <Grid container spacing={{xs: 2, md: 3}}>
+                    <Grid xs={12}>
+                        <TextField
+                            type="name"
+                            required
+                            fullWidth
+                            label="نام"
+                            autoComplete="name"
+                            autoFocus
+                            onChange={(e) => {
+                                setName(e.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid xs={12}>
+                        <TextField
+                            type="email"
+                            required
+                            fullWidth
+                            label="ایمیل"
+                            autoComplete="email"
+                            autoFocus
+                            onChange={(e) => {
+                                setEmail(e.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid xs={12}>
+
+                        <TextField
+                            required
+                            fullWidth
+                            label="رمز عبود"
+                            type="password"
+                            autoComplete="new-password"
+                            onChange={(e) => {
+                                setPassword(e.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid xs={12}>
+
+                        <TextField
+                            required
+                            fullWidth
+                            label="تکرار رمز عبور"
+                            type="text"
+                            autoComplete="new-password"
+                            onChange={(e) => {
+                                setCPassword(e.target.value)
+                            }}
+                        />
+                    </Grid>
+                    <Grid xs={12}>
+                        <LoadingButton
+                            loading={loading}
+                            variant="contained"
+                            fullWidth
+                            onClick={handleSubmit}
+                        >
+                            ثبت نام
+                        </LoadingButton>
+                    </Grid>
+
+                </Grid>
+            </Container>
+        </Box>
     );
 }
 

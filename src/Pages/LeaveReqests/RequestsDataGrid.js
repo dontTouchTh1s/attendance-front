@@ -262,13 +262,12 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
             disableColumnMenu: true,
             minWidth: 160,
             renderCell: (params) => {
-
                 return (
                     <Box sx={{width: '100%'}}>
                         <Button
-                            disabled={user.current.navBarUser().roll === 'manager' && params.status !== 'pending'}>تایید</Button>
+                            disabled={user.current.navBarUser.roll === 'manager' && params.row.status !== 'pending'}>تایید</Button>
                         <Button
-                            disabled={user.current.navBarUser().roll === 'manager' && params.status !== 'pending'}
+                            disabled={user.current.navBarUser.roll === 'manager' && params.row.status !== 'pending'}
                             color={'error'}
                             onClick={(event) => acceptDeclineRequest(event, params.id, 'declined')}>رد</Button>
                     </Box>
@@ -317,11 +316,11 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                         {clickedRowParams.row.description}
                     </p>
                     <Button
-                        disabled={user.current.navBarUser().roll === 'manager' && clickedRowParams.row.status !== 'pending'}
+                        disabled={user.current.navBarUser.roll === 'manager' && clickedRowParams.row.status !== 'pending'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
                     </Button>
                     <Button
-                        disabled={user.current.navBarUser().roll === 'manager' && clickedRowParams.row.status !== 'pending'}
+                        disabled={user.current.navBarUser.roll === 'manager' && clickedRowParams.row.status !== 'pending'}
                         color={'error'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
                     </Button>

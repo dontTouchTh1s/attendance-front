@@ -4,7 +4,7 @@ import {
     Box,
     Button,
     Container,
-    FormControl,
+    FormControl, FormHelperText, InputAdornment,
     InputLabel,
     MenuItem,
     Paper,
@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Api from "../../Api";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 function CreatePenaltyCondition() {
     const [type, setType] = useState('delay');
@@ -22,6 +23,11 @@ function CreatePenaltyCondition() {
     const [groupPolicy, setGroupPolicy] = useState('');
     const [groupPolicies, setGroupPolicies] = useState([]);
     const [typeTitle, setTypeTitle] = useState('تاخیر');
+
+    const [groupPolicyError, setGroupPolicyError] = useState('');
+    const [durationError, setDurationError] = useState('');
+    const [penaltyError, setPenaltyError] = useState('');
+    const [createPenaltyConditionLoading, setCreatePenaltyConditionLoading] = useState(false);
 
     function handleTypeChange(e) {
         setType(e.target.value)
@@ -43,7 +49,13 @@ function CreatePenaltyCondition() {
     }
 
     async function handleSubmit(e) {
-        e.preventDefault();
+        e.preventDefault()
+        handleGroupPolicyError();
+        handleDurationError();
+        handlePenaltyError();
+        if (groupPolicyError || durationError || penaltyError)
+            return;
+
         let data = {
             'type': type,
             'duration': duration,
@@ -51,10 +63,12 @@ function CreatePenaltyCondition() {
             'group_policy_id': groupPolicy
         };
         try {
-            const response = await Api.post('/penalty-conditions/create', data);
+            setCreatePenaltyConditionLoading(true);
+            await Api.post('/penalty-conditions/create', data);
+            setCreatePenaltyConditionLoading(false);
             // handle successful response
         } catch (error) {
-
+            setCreatePenaltyConditionLoading(false);
         }
 
     }
@@ -74,6 +88,31 @@ function CreatePenaltyCondition() {
         }
     }
 
+
+    function handleGroupPolicyError(value) {
+        if (value === '')
+            setGroupPolicyError('لطفا یک گروه سیاست کاری انتخاب کنید.');
+        else
+            setGroupPolicyError('');
+    }
+
+    function handleDurationError(value) {
+        const regex = new RegExp('^\\d+$');
+        if (regex.test(value) && duration !== '0') {
+            setDurationError('');
+        } else {
+            setDurationError('لطفا عدد معتبر وارد کنید.');
+        }
+    }
+
+    function handlePenaltyError(value) {
+        const regex = new RegExp('^\\d+$');
+        if (regex.test(value) && penalty !== '0') {
+            setPenaltyError('');
+        } else {
+            setPenaltyError('لطفا عدد معتبر وارد کنید.');
+        }
+    }
 
     return (
         <Box>
@@ -106,6 +145,8 @@ function CreatePenaltyCondition() {
                         <FormControl fullWidth>
                             <InputLabel id="group-policy-label">گروه سیاست کاری</InputLabel>
                             <Select
+                                error={groupPolicyError !== ''}
+                                onBlur={handleGroupPolicyError}
                                 autoWidth
                                 labelId="group-policy-label"
                                 value={groupPolicy}
@@ -116,16 +157,22 @@ function CreatePenaltyCondition() {
                                     <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
                                 )}
                             </Select>
+                            <FormHelperText error={groupPolicyError !== ''}>{groupPolicyError}</FormHelperText>
                         </FormControl>
                     </Grid>
                     <Grid sm={6} xs={12}>
                         <TextField
                             fullWidth
+                            error={durationError !== ''}
+                            helperText={durationError}
+                            onBlur={handleDurationError}
                             value={duration}
                             onChange={(e) => setDuration(e.target.value)}
                             placeholder={'زمان'}
-                            helperText={'زمان به دقیقه'}
                             label={'مدت زمان ' + typeTitle + ' برای اعمال جریمه'}
+                            InputProps={{
+                                endAdornment: <InputAdornment position="end">دقیقه</InputAdornment>,
+                            }}
                             type={'number'}
                         >
                         </TextField>
@@ -133,25 +180,31 @@ function CreatePenaltyCondition() {
                     <Grid sm={6} xs={12}>
                         <TextField
                             fullWidth
+                            error={penaltyError !== ''}
+                            helperText={penaltyError}
+                            onBlur={handlePenaltyError}
                             value={penalty}
                             onChange={(e) => setPenalty(e.target.value)}
                             placeholder={'زمان'}
-                            helperText={'زمان به دقیقه'}
                             label={'جریمه'}
+                            InputProps={{
+                                endAdornment: <InputAdornment position="end">دقیقه</InputAdornment>,
+                            }}
                             type={'number'}
                         >
                         </TextField>
                     </Grid>
 
                     <Grid xs={12} sm={6} md={4}>
-                        <Button
+                        <LoadingButton
+                            loading={createPenaltyConditionLoading}
                             type="submit"
                             variant="contained"
                             sx={{mt: 3, mb: 2}}
                             fullWidth
                             onClick={handleSubmit}
                         >ایجاد
-                        </Button>
+                        </LoadingButton>
                     </Grid>
                 </Grid>
             </Container>

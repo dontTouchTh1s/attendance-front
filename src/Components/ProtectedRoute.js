@@ -14,6 +14,8 @@ function ProtectedRoute({requiredRoll, children}) {
         try {
             let response = await Api.get('/auth/');
             user.current.setNavBarUser(response.data);
+            console.log(user.current.navBarUser);
+
             setChecked(true);
             if (requiredRoll !== undefined) {
                 if (!requiredRoll.includes(response.data.roll)) {

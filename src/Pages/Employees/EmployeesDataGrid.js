@@ -42,32 +42,32 @@ function EmployeesDataGrid({data}) {
             type: 'singleSelect',
             headerName: 'گروه سیاست کاری',
             headerAlign: 'left',
-            minWidth: 110,
+            minWidth: 150,
         },
         {
-            field: 'workPlace', type: 'singleSelect', headerName: 'محل کار', headerAlign: 'left', minWidth: 110,
+            field: 'workPlace', type: 'singleSelect', headerName: 'محل کار', headerAlign: 'left', minWidth: 150,
         },
 
-        {
-            field: "action",
-            headerName: "اعتراض",
-            headerAlign: 'center',
-            sortable: false,
-            disableColumnMenu: true,
-            minWidth: 160,
-            renderCell: (params) => {
-                return (
-
-                    <Button
-                        fullWidth
-                        color={'secondary'}
-                        onClick={(event) => objectionToAttendanceLeave(event, params.id, 'declined')}>ثبت
-                        اعتراض</Button>
-
-                );
-
-            }
-        }
+        // {
+        //     field: "action",
+        //     headerName: "اعتراض",
+        //     headerAlign: 'center',
+        //     sortable: false,
+        //     disableColumnMenu: true,
+        //     minWidth: 160,
+        //     renderCell: (params) => {
+        //         return (
+        //
+        //             <Button
+        //                 fullWidth
+        //                 color={'secondary'}
+        //                 onClick={(event) => objectionToAttendanceLeave(event, params.id, 'declined')}>ثبت
+        //                 اعتراض</Button>
+        //
+        //         );
+        //
+        //     }
+        // }
     ]
 
     async function sendObjection(event, id) {

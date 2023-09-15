@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Typography} from "@mui/material";
+import {Box, Container, switchClasses, Typography} from "@mui/material";
 import {BarChart} from "@mui/x-charts";
 import Api from "../../Api";
+import Grid2 from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Unstable_Grid2";
 
 function Dashboard() {
     const [months, setMonths] = useState([]);
@@ -10,7 +12,6 @@ function Dashboard() {
     async function fetchLeaveRequests() {
         try {
             const response = await Api.get('/leave-requests');
-            console.log(response)
             setMonths(response.data.map((l) =>
                 l.month
             ));
@@ -32,15 +33,22 @@ function Dashboard() {
             <Typography component="h1" variant="h4">
                 داشبورد
             </Typography>
-            {
-                counts.length !== 0 ?
-                    <BarChart
-                        xAxis={[{scaleType: 'band', data: months}]}
-                        series={[{data: counts, label: 'مرخصی ها در ماه های گذشته', type: 'bar'}]}
-                        width={500}
-                        height={300}
-                    /> : 'داده ای وجود ندارد'
-            }
+            <Grid container>
+                <Grid xs={12}>
+                    {
+                        counts.length !== 0 ?
+                            <BarChart sx={{
+                                width: '100'
+                            }}
+
+                                      xAxis={[{scaleType: 'band', data: months}]}
+                                      series={[{data: counts, label: 'مرخصی ها در ماه های گذشته', type: 'bar'}]}
+                                      width={500}
+                                      height={300}
+                            /> : 'داده ای وجود ندارد'
+                    }
+                </Grid>
+            </Grid>
         </Box>
     )
 }
