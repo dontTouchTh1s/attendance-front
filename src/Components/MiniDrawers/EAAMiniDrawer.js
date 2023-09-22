@@ -78,7 +78,7 @@ function EAAMiniDrawer() {
                 }
             ]}
         >
-            <Box sx={{padding: '24px 0'}}>
+            <Box sx={{padding: '0'}}>
                 <Outlet>
                 </Outlet>
             </Box>
