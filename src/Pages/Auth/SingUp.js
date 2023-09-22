@@ -42,7 +42,7 @@ function SingUp() {
             <Typography component="h1" variant="h4" sx={{textAlign: 'center'}}>
                 ثبت نام
             </Typography>
-            <Container disableGutters maxWidth={'xs'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+            <Container disableGutters maxWidth={'xs'} sx={{p: {xs: 1, md: 2}}}>
                 <Grid container spacing={{xs: 2, md: 3}}>
                     <Grid xs={12}>
                         <TextField
