@@ -216,7 +216,11 @@ export default function MiniDrawer({pages, section, children}) {
                     ))}
                 </List>
             </Drawer>
-            <Box component="main" sx={{flexGrow: 1, p: 3}}>
+            <Box component="main" sx={{
+                flexGrow: 1,
+                p: {xs: 1, md: 2},
+                overflowX: 'hidden'
+            }}>
                 <DrawerHeader/>
                 {children}
             </Box>
