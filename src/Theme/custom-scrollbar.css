@@ -1,0 +1,32 @@
+.custom-scrollbar.small::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+
+.custom-scrollbar.medium::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+
+}
+
+.custom-scrollbar::-webkit-scrollbar:disabled {
+    display: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(217, 217, 217, 0.34);
+}
+
+/* Handle */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 50px;
+    background: #888;
+}
+
+/* Handle on hover */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
