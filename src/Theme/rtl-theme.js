@@ -4,6 +4,13 @@ import {faIR as dataGridFaIR} from "@mui/x-data-grid";
 
 export const theme = createTheme(
     {
+        palette: {
+            unImportant: {
+                main: '#646464',
+                contrastText: '#eeeeee',
+
+            }
+        },
         typography: {
             fontFamily: [
                 "'Vazirmatn', sans-serif"
