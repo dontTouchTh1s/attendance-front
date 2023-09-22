@@ -1,9 +1,10 @@
 import GoogleMap from "../../Components/Map/GoogleMap";
 import React, {useState} from 'react'
 import Api from "../../Api";
-import {Box, Container, InputAdornment, TextField, Typography,} from "@mui/material";
+import {Box, Container, InputAdornment, Snackbar, TextField, Typography,} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {Alert} from "@mui/lab";
 
 const defaultLocation = {lat: 32.6539, lng: 51.6660};
 const defaultZoom = 10;
@@ -18,12 +19,13 @@ function CreateWorkPlace() {
     const [addressError, setAddressError] = useState('');
     const [radiusError, setRadiusError] = useState('');
     const [createWorkPlaceLoading, setCreateWorkPlaceLoading] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarType, setSnackbarType] = useState('error');
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     async function handleSubmitWorkPlace() {
         // Insert new work place to database
-        handleRadiusError();
-        handleAddressError();
-        if (radiusError || addressError || nameError)
+        if (handleFormError())
             return;
         let data = {
             'name': name,
@@ -35,12 +37,20 @@ function CreateWorkPlace() {
 
         try {
             setCreateWorkPlaceLoading(true);
-            await Api.post('/work-places/create', {...data});
+            let response = await Api.post('/work-places/create', {...data});
             setCreateWorkPlaceLoading(false);
-
+            console.log(response)
+            if (response.status === 201) {
+                setSnackbarOpen(true);
+                setSnackbarType('success');
+                setSnackbarMessage('محل کار با موفقیت اضافه شد.');
+            }
             // handle successful response
         } catch (error) {
             setCreateWorkPlaceLoading(false);
+            setSnackbarOpen(true);
+            setSnackbarType('error');
+            setSnackbarMessage('در هنگام ثبت اطلاعات مشکلی پیش آمده است.');
         }
 
     }
@@ -54,29 +64,49 @@ function CreateWorkPlace() {
         setZoom(newZoom);
     }
 
+    function handleFormError() {
+        let error = false;
+        if (handleRadiusError(radius)) error = true;
+        if (handleNameError(name)) error = true;
+        if (handleAddressError(address)) error = true;
+        return error;
+    }
+
     function handleRadiusError(value) {
         const regex = new RegExp('^\\d+$');
-        if (regex.test(value) && value !== '0') {
+        if (regex.test(value) && value !== 0) {
             setRadiusError('');
+            return false;
         } else {
             setRadiusError('لطفا شعاع معتبر وارد کنید.');
+            return true;
         }
     }
 
     function handleNameError(value) {
         if (value === '') {
             setNameError('لطفا این فیلد را پر کنید.');
+            return true;
         } else {
             setNameError('');
+            return false;
         }
     }
 
     function handleAddressError(value) {
         if (value === '') {
             setAddressError('لطفا این فیلد را پر کنید.');
+            return true;
         } else {
             setAddressError('');
+            return false;
         }
+    }
+
+    function handleSnackBarClose(e, reason) {
+        if (reason === 'clickaway')
+            return;
+        setSnackbarOpen(false);
     }
 
     return (
@@ -88,14 +118,14 @@ function CreateWorkPlace() {
                 برای اضافه کردن محل کار جدید، مکان آن روی نقشه را به صورت دقیق انتخاب کنید و شعاع مساحت محل کار را به
                 صورت تقریبی وارد کنید.
             </Typography>
-            <Container disableGutters maxWidth={'xl'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+            <Box sx={{p: {xs: 1, md: 2}}}>
                 <Grid container spacing={{xs: 2, md: 3}}>
                     <Grid xs={12} md={5}>
                         <Box>
                             <Grid container spacing={{xs: 2, md: 3}}>
                                 <Grid xs={12}>
                                     <TextField
-                                        onBlur={handleNameError}
+                                        onBlur={(e) => handleNameError(e.target.value)}
                                         helperText={nameError}
                                         error={nameError !== ''}
                                         autoFocus
@@ -111,8 +141,7 @@ function CreateWorkPlace() {
                                 </Grid>
                                 <Grid xs={12}>
                                     <TextField
-                                        onBlur={handleAddressError}
-                                        helperText={addressError}
+                                        onBlur={(e) => handleAddressError(e.target.value)} helperText={addressError}
                                         error={addressError !== ''}
                                         label={'آدرس'}
                                         value={address}
@@ -128,7 +157,7 @@ function CreateWorkPlace() {
                                 </Grid>
                                 <Grid xs={12}>
                                     <TextField
-                                        onBlur={handleRadiusError}
+                                        onBlur={(e) => handleRadiusError(e.target.value)}
                                         error={radiusError !== ''}
                                         helperText={radiusError}
                                         fullWidth
@@ -168,7 +197,15 @@ function CreateWorkPlace() {
                         </LoadingButton>
                     </Grid>
                 </Grid>
-            </Container>
+            </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackBarClose}>
+                <Alert severity={snackbarType} sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     )
 }

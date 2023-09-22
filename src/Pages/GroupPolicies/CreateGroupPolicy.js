@@ -7,7 +7,7 @@ import {
     FormControl, FormHelperText, InputAdornment,
     InputLabel,
     MenuItem,
-    Select,
+    Select, Snackbar,
     TextField,
     Typography
 } from "@mui/material";
@@ -17,6 +17,7 @@ import {LocalizationProvider, TimePicker} from "@mui/x-date-pickers-pro";
 import {AdapterMomentJalaali} from "@mui/x-date-pickers-pro/AdapterMomentJalaali";
 import moment from "moment-jalaali";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {Alert} from "@mui/lab";
 
 
 function CreateGroupPolicy() {
@@ -33,12 +34,13 @@ function CreateGroupPolicy() {
     const [workPlaceError, setWorkPlaceError] = useState('');
     const [createGroupPolicyLoading, setCreateGroupPolicyLoading] = useState(false);
 
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarType, setSnackbarType] = useState('error');
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
     async function handleSubmit(e) {
         e.preventDefault();
-        handleMaxLeaveMonthError();
-        handleMaxLeaveYearError();
-        handleWorkPlaceError();
-        if (nameError || maxLeaveYearError || maxLeaveMonthError || workPlaceError)
+        if (handleFormError())
             return;
         let data = {
             'name': name,
@@ -50,11 +52,20 @@ function CreateGroupPolicy() {
         };
         try {
             setCreateGroupPolicyLoading(true);
-            await Api.post('/group-policies/create', data);
+            let response = await Api.post('/group-policies/create', data);
             setCreateGroupPolicyLoading(false);
+            if (response.status === 201) {
+                setSnackbarOpen(true)
+                setSnackbarMessage('گروه سیاست کاری با موفقیت اضافه شد.');
+                setSnackbarType('success');
+            }
+
             // handle successful response
         } catch (error) {
             setCreateGroupPolicyLoading(false);
+            setSnackbarOpen(true)
+            setSnackbarMessage('در هنگام ثبت اطلاعات مشکلی پیش آمده است.');
+            setSnackbarType('error');
         }
 
     }
@@ -74,19 +85,32 @@ function CreateGroupPolicy() {
         }
     }
 
+    function handleFormError() {
+        let error = false;
+        if (handleNameError(name)) error = true;
+        if (handleWorkPlaceError(workPlace)) error = true;
+        if (handleMaxLeaveMonthError(maxLeaveMonth)) error = true;
+        if (handleMaxLeaveYearError(maxLeaveYear)) error = true;
+        return error;
+    }
 
     function handleNameError(value) {
-        if (value === '')
+        if (value === '') {
             setNameError('لطفا این فیلد را پر کنید.');
-        else
+            return true;
+        } else {
             setNameError('');
+            return false;
+        }
     }
 
     function handleWorkPlaceError(value) {
         if (value === '') {
             setWorkPlaceError('لطفا یک محل کار انتخاب کنید.');
+            return true;
         } else {
             setWorkPlaceError('');
+            return false;
         }
     }
 
@@ -94,8 +118,10 @@ function CreateGroupPolicy() {
         const regex = new RegExp('^\\d+$');
         if (regex.test(value) && value !== '0') {
             setMaxLeaveMonthError('');
+            return false;
         } else {
             setMaxLeaveMonthError('لطفا عدد معتبر وارد کنید.');
+            return true;
         }
     }
 
@@ -103,9 +129,17 @@ function CreateGroupPolicy() {
         const regex = new RegExp('^\\d+$');
         if (regex.test(value) && value !== '0') {
             setMaxLeaveYearError('');
+            return false;
         } else {
             setMaxLeaveYearError('لطفا عدد معتبر وارد کنید.');
+            return true;
         }
+    }
+
+    function handleSnackBarClose(e, reason) {
+        if (reason === 'clickaway')
+            return;
+        setSnackbarOpen(false);
     }
 
     return (
@@ -118,11 +152,11 @@ function CreateGroupPolicy() {
                 <Typography component='p' sx={{marginTop: '8px'}}>
                     در این بخش میتوانید سیاست کاری برای گروه های مختلف کارکنان ایجاد کنید.
                 </Typography>
-                <Container disableGutters maxWidth={'md'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+                <Container disableGutters maxWidth={'md'} sx={{p: {xs: 1, md: 2}}}>
                     <Grid container spacing={{xs: 2, md: 3}}>
                         <Grid sm={6} xs={12}>
                             <TextField
-                                onBlur={handleNameError}
+                                onBlur={(e) => handleNameError(e.target.value)}
                                 error={nameError !== ''}
                                 helperText={nameError}
                                 fullWidth
@@ -144,7 +178,7 @@ function CreateGroupPolicy() {
                                 <InputLabel id="work-place-label">محل کار</InputLabel>
                                 <Select
                                     autoWidth
-                                    onBlur={handleWorkPlaceError}
+                                    onBlur={(e) => handleWorkPlaceError(e.target.value)}
                                     error={workPlaceError !== ''}
                                     labelId="work-place-label"
                                     value={workPlace}
@@ -164,7 +198,7 @@ function CreateGroupPolicy() {
                         <Grid sm={6} xs={12}>
                             <TextField
                                 fullWidth
-                                onBlur={handleMaxLeaveMonthError}
+                                onBlur={(e) => handleMaxLeaveMonthError(e.target.value)}
                                 error={maxLeaveMonthError !== ''}
                                 helperText={maxLeaveMonthError}
                                 value={maxLeaveMonth}
@@ -186,7 +220,7 @@ function CreateGroupPolicy() {
                             <TextField
                                 fullWidth
                                 value={maxLeaveYear}
-                                onBlur={handleMaxLeaveYearError}
+                                onBlur={(e) => handleMaxLeaveYearError(e.target.value)}
                                 error={maxLeaveYearError !== ''}
                                 helperText={maxLeaveYearError}
                                 onChange={(e) => {
@@ -238,6 +272,14 @@ function CreateGroupPolicy() {
                     </Grid>
                 </Container>
             </LocalizationProvider>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackBarClose}>
+                <Alert severity={snackbarType} sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

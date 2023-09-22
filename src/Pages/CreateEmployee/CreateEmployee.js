@@ -8,7 +8,7 @@ import {
     InputLabel,
     MenuItem,
     Paper,
-    Select,
+    Select, Snackbar,
     TextField,
     Typography
 } from "@mui/material";
@@ -16,6 +16,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Api from "../../Api";
 import UserContext from "../../Contexts/UserContext";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {Alert} from "@mui/lab";
 
 function CreatePenaltyCondition() {
     const [firstName, setFirstName] = useState();
@@ -35,18 +36,19 @@ function CreatePenaltyCondition() {
     const [groupPolicyError, setGroupPolicyError] = useState('');
     const [createEmployeeLoading, setCreateEmployeeLoading] = useState(false);
 
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarType, setSnackbarType] = useState('error');
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
     const user = useContext(UserContext);
 
     async function handleSubmit(e) {
         e.preventDefault();
-        handleEmailError(email);
-        handleFirstNameError(firstName);
-        handleLastNameError(lastName);
-        handlePasswordError(password)
-        handleGroupPolicyError(groupPolicy);
-        if (emailError || firstNameError || lastNameError || passwordError || groupPolicyError) {
+
+        if (handleFormError()) {
             return;
         }
+
         let data = {
             'first_name': firstName,
             'last_name': lastName,
@@ -59,11 +61,24 @@ function CreatePenaltyCondition() {
             data.roll = roll;
         try {
             setCreateEmployeeLoading(true);
-            await Api.post('/employees/create', data);
+            let response = await Api.post('/employees/create', data);
             setCreateEmployeeLoading(false);
+            if (response.status === 201) {
+                setSnackbarOpen(true)
+                setSnackbarMessage('کارمند جدید با موفقیت اضافه شد.');
+                setSnackbarType('success');
+            }
             // handle successful response
         } catch (error) {
             setCreateEmployeeLoading(false);
+            setSnackbarOpen(true)
+            setSnackbarType('error');
+            if (error.response.status === 422) {
+                setSnackbarMessage('کارمندی با این ایمیل قبلا ثبت شده است.');
+            } else {
+                setSnackbarMessage('در هنگام ثبت اطلاعات مشکلی پیش آمده است.');
+            }
+
         }
 
     }
@@ -95,12 +110,24 @@ function CreatePenaltyCondition() {
         }
     }
 
+    function handleFormError() {
+        let error = false;
+        if (handleEmailError(email)) error = true;
+        if (handleFirstNameError(firstName)) error = true;
+        if (handleLastNameError(lastName)) error = true;
+        if (handlePasswordError(password)) error = true;
+        if (handleGroupPolicyError(groupPolicy)) error = true;
+        return error;
+    }
+
     function handleEmailError(value) {
         const regex = new RegExp('^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$');
         if (!regex.test(value)) {
             setEmailError('لطفا یک ایمیل معتبر وارد کنید.');
+            return true;
         } else {
             setEmailError('');
+            return false;
         }
     }
 
@@ -108,8 +135,10 @@ function CreatePenaltyCondition() {
         let regex = /^[\u0600-\u06FF\s]+$/;
         if (!regex.test(value)) {
             setFirstNameError('لطفا یک نام معتبر وارد کنید.');
+            return true;
         } else {
             setFirstNameError('');
+            return false;
         }
     }
 
@@ -117,24 +146,37 @@ function CreatePenaltyCondition() {
         let regex = /^[\u0600-\u06FF\s]+$/;
         if (!regex.test(value)) {
             setLastNameError('لطفا یک نام خانوادگی معتبر وارد کنید.');
+            return true;
         } else {
             setLastNameError('');
+            return false;
         }
     }
 
     function handlePasswordError(value) {
         if (value.length < 8) {
             setPasswordError('رمز عبور حداقل 8 باید باشد.');
+            return true;
         } else {
             setPasswordError('');
+            return false;
         }
     }
 
     function handleGroupPolicyError(value) {
-        if (value === '')
+        if (value === '') {
             setGroupPolicyError('لطفا یک گروه سیاست کاری انتخاب کنید.');
-        else
+            return true;
+        } else {
             setGroupPolicyError('');
+            return false;
+        }
+    }
+
+    function handleSnackBarClose(e, reason) {
+        if (reason === 'clickaway')
+            return;
+        setSnackbarOpen(false);
     }
 
     return (
@@ -147,7 +189,7 @@ function CreatePenaltyCondition() {
                 کنید.
 
             </Typography>
-            <Container disableGutters maxWidth={'md'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+            <Container disableGutters maxWidth={'md'} sx={{p: {xs: 1, md: 2}}}>
                 <Grid container spacing={{xs: 2, md: 3}}>
                     <Grid sm={6} xs={12}>
                         <TextField
@@ -280,7 +322,7 @@ function CreatePenaltyCondition() {
                     }
 
 
-                    <Grid xs={12} sm={7}>
+                    <Grid xs={12} sm={6} md={4}>
                         <LoadingButton
                             loading={createEmployeeLoading}
                             type="submit"
@@ -293,6 +335,14 @@ function CreatePenaltyCondition() {
                     </Grid>
                 </Grid>
             </Container>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackBarClose}>
+                <Alert severity={snackbarType} sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

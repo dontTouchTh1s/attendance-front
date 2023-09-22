@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
-import {Box, Container, CssBaseline, InputAdornment, TextField, Typography} from "@mui/material";
+import {Box, Container, CssBaseline, InputAdornment, Snackbar, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
 import {useNavigate} from "react-router-dom";
 import Grid from "@mui/material/Unstable_Grid2";
 import LoadingButton from '@mui/lab/LoadingButton';
 import IconButton from "@mui/material/IconButton";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
+import {Alert} from "@mui/lab";
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -17,12 +18,12 @@ function Login() {
     const [emailErrorText, setEmailErrorText] = useState('');
     const [loginLoading, setLoginLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     async function handleSubmit(e) {
         e.preventDefault();
-
-        handlePasswordError(password);
-        if (passwordError || emailError)
+        if (handleFormError())
             return;
 
         let formData = new FormData();
@@ -45,7 +46,21 @@ function Login() {
             }
         } catch (error) {
             setLoginLoading(false);
+            setSnackbarOpen(true);
+            if (error.response.status === 401) {
+                setSnackbarMessage('نام کاربری یا رمز عبور صحیح نمی باشد.');
+            } else {
+                setSnackbarMessage('در هنگام دریافت اطلاعات مشکلی پیش آمده است.');
+            }
         }
+    }
+
+    function handleFormError() {
+        let error = false;
+        if (handleEmailError(email)) error = true;
+        if (handlePasswordError(password)) error = true;
+
+        return error;
     }
 
     function handleEmailError(value) {
@@ -53,9 +68,11 @@ function Login() {
         if (!regex.test(value)) {
             setEmailError(true);
             setEmailErrorText('یک ایمیل معتبر وارد کنید.');
+            return true;
         } else {
             setEmailError(false);
             setEmailErrorText('');
+            return false;
         }
     }
 
@@ -63,10 +80,20 @@ function Login() {
         if (value.length < 8) {
             setPasswordError(true);
             setPasswordErrorText('رمز عبور حداقل 8 کاراکتر است.');
+            return true;
         } else {
             setPasswordError(false);
             setPasswordErrorText('');
+            return false;
         }
+    }
+
+    function handleSnackBarClose(event, reason) {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setSnackbarOpen(false);
     }
 
     return (
@@ -75,12 +102,12 @@ function Login() {
             <Typography component="h1" variant="h4" sx={{textAlign: 'center'}}>
                 ورود
             </Typography>
-            <Container disableGutters maxWidth={'xs'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+            <Container disableGutters maxWidth={'xs'} sx={{p: {xs: 1, md: 2}}}>
                 <Grid container spacing={{xs: 2, md: 3}}>
                     <Grid xs={12}>
                         <TextField
                             type="email"
-                            onBlur={handleEmailError}
+                            onBlur={(e) => handleEmailError(e.target.value)}
                             error={emailError}
                             helperText={emailErrorText}
                             required
@@ -97,7 +124,7 @@ function Login() {
                     </Grid>
                     <Grid xs={12}>
                         <TextField
-                            onBlur={handlePasswordError}
+                            onBlur={(e) => handlePasswordError(e.target.value)}
                             helperText={passwordErrorText}
                             error={passwordError}
                             required
@@ -140,6 +167,14 @@ function Login() {
                     </Grid>
                 </Grid>
             </Container>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackBarClose}>
+                <Alert severity="error" sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

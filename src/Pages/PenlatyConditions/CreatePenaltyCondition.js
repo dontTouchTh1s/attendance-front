@@ -8,13 +8,14 @@ import {
     InputLabel,
     MenuItem,
     Paper,
-    Select,
+    Select, Snackbar,
     TextField,
     Typography
 } from "@mui/material";
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Api from "../../Api";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {Alert} from "@mui/lab";
 
 function CreatePenaltyCondition() {
     const [type, setType] = useState('delay');
@@ -28,6 +29,10 @@ function CreatePenaltyCondition() {
     const [durationError, setDurationError] = useState('');
     const [penaltyError, setPenaltyError] = useState('');
     const [createPenaltyConditionLoading, setCreatePenaltyConditionLoading] = useState(false);
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarType, setSnackbarType] = useState('error');
 
     function handleTypeChange(e) {
         setType(e.target.value)
@@ -50,10 +55,8 @@ function CreatePenaltyCondition() {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        handleGroupPolicyError();
-        handleDurationError();
-        handlePenaltyError();
-        if (groupPolicyError || durationError || penaltyError)
+
+        if (handleFormError())
             return;
 
         let data = {
@@ -64,11 +67,19 @@ function CreatePenaltyCondition() {
         };
         try {
             setCreatePenaltyConditionLoading(true);
-            await Api.post('/penalty-conditions/create', data);
+            let response = await Api.post('/penalty-conditions/create', data);
             setCreatePenaltyConditionLoading(false);
+            if (response.status === 201) {
+                setSnackbarOpen(true)
+                setSnackbarMessage('شرط جریمه با موفقیت اضافه شد.');
+                setSnackbarType('success');
+            }
             // handle successful response
         } catch (error) {
             setCreatePenaltyConditionLoading(false);
+            setSnackbarOpen(true)
+            setSnackbarMessage('در هنگام ثبت اطلاعات مشکلی پیش آمده است.');
+            setSnackbarType('error');
         }
 
     }
@@ -88,20 +99,32 @@ function CreatePenaltyCondition() {
         }
     }
 
+    function handleFormError() {
+        let error = false;
+        if (handleGroupPolicyError(groupPolicy)) error = true;
+        if (handleDurationError(duration)) error = true;
+        if (handlePenaltyError(penalty)) error = true;
+        return error;
+    }
 
     function handleGroupPolicyError(value) {
-        if (value === '')
+        if (value === '') {
             setGroupPolicyError('لطفا یک گروه سیاست کاری انتخاب کنید.');
-        else
+            return true;
+        } else {
             setGroupPolicyError('');
+            return false;
+        }
     }
 
     function handleDurationError(value) {
         const regex = new RegExp('^\\d+$');
         if (regex.test(value) && duration !== '0') {
             setDurationError('');
+            return false;
         } else {
             setDurationError('لطفا عدد معتبر وارد کنید.');
+            return true;
         }
     }
 
@@ -109,9 +132,17 @@ function CreatePenaltyCondition() {
         const regex = new RegExp('^\\d+$');
         if (regex.test(value) && penalty !== '0') {
             setPenaltyError('');
+            return false;
         } else {
             setPenaltyError('لطفا عدد معتبر وارد کنید.');
+            return true;
         }
+    }
+
+    function handleSnackBarClose(e, reason) {
+        if (reason === 'clickaway')
+            return;
+        setSnackbarOpen(false);
     }
 
     return (
@@ -122,7 +153,7 @@ function CreatePenaltyCondition() {
             <Typography component='p' sx={{marginTop: '8px'}}>
                 در این بخش میتوانید شرایط جدید برای جریمه شدن کارمندان در صورت تاخیر، تاجیل یا خروج میان کار تعیین کنید.
             </Typography>
-            <Container disableGutters maxWidth={'md'} component={'main'} sx={{p: {xs: 2, md: 3}}}>
+            <Container disableGutters maxWidth={'md'} sx={{p: {xs: 1, md: 2}}}>
                 <Grid container spacing={{xs: 2, md: 3}}>
                     <Grid sm={6} xs={12}>
                         <FormControl fullWidth>
@@ -146,7 +177,7 @@ function CreatePenaltyCondition() {
                             <InputLabel id="group-policy-label">گروه سیاست کاری</InputLabel>
                             <Select
                                 error={groupPolicyError !== ''}
-                                onBlur={handleGroupPolicyError}
+                                onBlur={(e) => handleGroupPolicyError(e.target.value)}
                                 autoWidth
                                 labelId="group-policy-label"
                                 value={groupPolicy}
@@ -165,7 +196,7 @@ function CreatePenaltyCondition() {
                             fullWidth
                             error={durationError !== ''}
                             helperText={durationError}
-                            onBlur={handleDurationError}
+                            onBlur={(e) => handleDurationError(e.target.value)}
                             value={duration}
                             onChange={(e) => setDuration(e.target.value)}
                             placeholder={'زمان'}
@@ -182,7 +213,7 @@ function CreatePenaltyCondition() {
                             fullWidth
                             error={penaltyError !== ''}
                             helperText={penaltyError}
-                            onBlur={handlePenaltyError}
+                            onBlur={(e) => handlePenaltyError(e.target.value)}
                             value={penalty}
                             onChange={(e) => setPenalty(e.target.value)}
                             placeholder={'زمان'}
@@ -208,6 +239,14 @@ function CreatePenaltyCondition() {
                     </Grid>
                 </Grid>
             </Container>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackBarClose}>
+                <Alert severity={snackbarType} sx={{width: '100%'}}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }
