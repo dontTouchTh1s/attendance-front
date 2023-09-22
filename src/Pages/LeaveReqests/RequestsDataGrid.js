@@ -85,12 +85,11 @@ const StyledDataGrid = styled(DataGridPro)(({theme}) => ({
     },
 }));
 
-function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest}) {
+function RequestsDataGrid({onSelectedRowsChanged, selectedRows, filters, data, onModifyRequest, loading}) {
     const [modalInfoOpen, setModalInfoOpen] = useState(false);
     const [filterModel, setFilterModel] = useState({items: []});
     const [clickedRowParams, setClickedRowParams] = useState({row: {}});
     const user = useContext(UserContext);
-
     useEffect(() => {
         // Convert type to persian text
         // eslint-disable-next-line default-case
@@ -147,7 +146,7 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
         };
 
         try {
-            const response = await Api.post('/requests/' + id, {...data, _method: 'patch'});
+            await Api.post('/requests/' + id, {...data, _method: 'patch'});
             // handle successful response
         } catch (error) {
 
@@ -293,12 +292,15 @@ function RequestsDataGrid({onSelectedRowsChanged, filters, data, onModifyRequest
                     let diff = abs(momentDate.diff(now, 'days'));
                     return `app-theme-different--${diff}`;
                 }}
+                loading={loading}
                 columns={columns}
                 checkboxSelection
                 filterModel={filterModel}
                 onFilterModelChange={(model) => {
                     setFilterModel(model)
                 }}
+
+                rowSelectionModel={selectedRows}
                 disableRowSelectionOnClick
                 onRowSelectionModelChange={onSelectedRowsChanged}
                 onRowClick={(gridRowParams) => {

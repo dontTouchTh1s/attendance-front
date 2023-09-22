@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Button, Container,
     FormControl,
     IconButton,
     InputLabel,
@@ -19,6 +19,8 @@ import RequestsDataGrid from "./RequestsDataGrid";
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {DateRangePicker} from "@mui/x-date-pickers-pro/DateRangePicker";
 import './leave-request.css';
+import Grid from "@mui/material/Unstable_Grid2";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 moment.loadPersian({dialect: 'persian-modern', usePersianDigits: false});
 const style = {
@@ -50,13 +52,13 @@ function LeaveRequests() {
     const [data, setData] = useState({rows: []});
     const [selectedRows, setSelectedRows] = useState([]);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [refreshLoading, setRefreshLoading] = useState(false);
     useEffect(() => {
         fetchRequests();
     }, [])
 
     function handleSelectedRowsChanged(value) {
         setSelectedRows(value);
-
     }
 
     async function modifyMultipleRequests(status) {
@@ -69,7 +71,7 @@ function LeaveRequests() {
         };
 
         try {
-            const response = await Api.post('/requests/', {...data, _method: 'patch'});
+            await Api.post('/requests/', {...data, _method: 'patch'});
             // handle successful response
         } catch (error) {
 
@@ -84,7 +86,9 @@ function LeaveRequests() {
 
     async function fetchRequests() {
         try {
+            setRefreshLoading(true);
             const response = await Api.get('/requests');
+            setRefreshLoading(false);
             // handle successful response
             let data = response.data.data;
             setData({
@@ -93,16 +97,8 @@ function LeaveRequests() {
 
 
         } catch (error) {
-
+            setRefreshLoading(false);
         }
-    }
-
-    function openConfirmModal(status) {
-
-        if (status === 'accepted')
-            setConfirmStatus('تایید');
-        else setConfirmStatus('رد');
-        setConfirmModalOpen(true);
     }
 
     return (
@@ -119,179 +115,181 @@ function LeaveRequests() {
             <Typography component={'p'} sx={{marginTop: '8px'}}>
                 درخواست های های خیلی نزدیک به امروز با رنگ قرمز تری نمایش داده میشوند.
             </Typography>
-            <Box sx={{
-                padding: '24px 0'
-            }}>
-                <Box sx={{
-                    display: 'flex',
-                    marginTop: '8px',
-                    gap: '12px'
-                }}>
-                    <FormControl sx={{
-                        minWidth: '150px'
-                    }}>
-                        <InputLabel id="type-label">نوع مرخصی</InputLabel>
-                        <Select
-                            autoWidth
-                            labelId="type-label"
-                            id="type"
-                            value={filter.type}
-                            onChange={(e) => setFilter({...filter, type: e.target.value})}
-                            label="نوع مرخصی"
-                            autoFocus
+            <Box sx={{p: {xs: 1, md: 2}}}>
+                <Grid container rowSpacing={{xs: 2}} columnSpacing={{xs: 1}}>
+                    <Grid xs={12} sm={6} lg={3}>
+                        <FormControl fullWidth>
+                            <InputLabel id="type-label">نوع مرخصی</InputLabel>
+                            <Select
+                                autoWidth
+                                labelId="type-label"
+                                id="type"
+                                value={filter.type}
+                                onChange={(e) => setFilter({...filter, type: e.target.value})}
+                                label="نوع مرخصی"
+                                autoFocus
+                            >
+                                <MenuItem value={'all'}>همه</MenuItem>
+                                <MenuItem value={'paid'}>استحقاقی</MenuItem>
+                                <MenuItem value={'sick'}>استعلاحی</MenuItem>
+                                <MenuItem value={'noPay'}>بدون حقوق</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} sm={6} lg={3}>
+                        <FormControl fullWidth>
+                            <InputLabel id="group-label">گروه پرسنلی</InputLabel>
+                            <Select
+                                autoWidth
+                                labelId="group-label"
+                                id="group"
+                                value={filter.group}
+                                onChange={(e) => setFilter({...filter, group: e.target.value})} label="گروه پرسنلی"
+                            >
+                                <MenuItem value={1}>مدیران</MenuItem>
+                                <MenuItem value={2}>آبدارچی</MenuItem>
+                                <MenuItem value={0}>همه</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} sm={6} lg={3}>
+                        <FormControl fullWidth>
+                            <InputLabel id="type-label">وضعیت</InputLabel>
+                            <Select
+                                autoWidth
+                                value={filter.status}
+                                onChange={(e) => setFilter({...filter, status: e.target.value})}
+                                label="وضعیت"
+                                autoFocus
+                            >
+                                <MenuItem value={'all'}>همه</MenuItem>
+                                <MenuItem value={'pending'}>در حال بررسی</MenuItem>
+                                <MenuItem value={'accepted'}>تایید شده</MenuItem>
+                                <MenuItem value={'declined'}>رد شده</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} sm={6} lg={3}>
+                        <TextField
+                            fullWidth
+                            value={filter.name}
+                            label='نام پرسنل'
+                            id='employeeNameSearch'
+                            name='employeeNameSearch'
+                            autoComplete='name'
+                            onChange={(e) =>
+                                setFilter({...filter, name: e.target.value})}>
+                        </TextField>
+                    </Grid>
+                    <Grid xs={12} lg={5.5}>
+                        <FormControl className={"date-range-picker-container"} fullWidth sx={{mt: 2}}>
+                            <p>تاریخ درخواست مرخصی</p>
+                            <DateRangePicker
+                                localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
+                                id="leave_date"
+                                label="تاریخ مرخصی"
+                                value={filter.leaveDate}
+                                onChange={newValue => setFilter({...filter, leaveDate: newValue})}>
+                            </DateRangePicker>
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} lg={5.5} sx={{mt: 2}}>
+                        <FormControl className={"date-range-picker-container"} fullWidth>
+                            <p>تاریخ ثبت</p>
+                            <DateRangePicker
+                                localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
+                                id="create_date"
+                                value={filter.createDate}
+                                onChange={newValue => setFilter({...filter, createDate: newValue})}>
+                            </DateRangePicker>
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} lg={1}>
+                        <LoadingButton
+                            loading={refreshLoading}
+                            sx={{height: '100%'}}
+                            fullWidth
+                            size="large"
+                            aria-label="refresh"
+                            onClick={fetchRequests}
+                            endIcon={<RefreshIcon/>}
                         >
-                            <MenuItem value={'all'}>همه</MenuItem>
-                            <MenuItem value={'paid'}>استحقاقی</MenuItem>
-                            <MenuItem value={'sick'}>استعلاحی</MenuItem>
-                            <MenuItem value={'noPay'}>بدون حقوق</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl sx={{
-                        display: 'none',
-                        minWidth: '150px'
-                    }}>
-                        <InputLabel id="group-label">گروه پرسنلی</InputLabel>
-                        <Select
-                            autoWidth
-                            labelId="group-label"
-                            id="group"
-                            value={filter.group}
-                            onChange={(e) => setFilter({...filter, group: e.target.value})} label="گروه پرسنلی"
+                            بروزرسانی
+                        </LoadingButton>
+                    </Grid>
+                    <Grid xs={12}>
+                        <RequestsDataGrid onSelectedRowsChanged={handleSelectedRowsChanged}
+                                          selectedRows={selectedRows}
+                                          filters={filter}
+                                          data={data}
+                                          onModifyRequest={requestModifyHandler}
+                                          loading={refreshLoading}
                         >
-                            <MenuItem value={1}>مدیران</MenuItem>
-                            <MenuItem value={2}>آبدارچی</MenuItem>
-                            <MenuItem value={0}>همه</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl className={"date-range-picker-container"}>
-                        <p>تاریخ ثبت</p>
-                        <DateRangePicker
-                            localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
-                            id="create_date"
-                            value={filter.createDate}
-                            onChange={newValue => setFilter({...filter, createDate: newValue})}>
-
-                        </DateRangePicker>
-                    </FormControl>
-                    <FormControl className={"date-range-picker-container"}>
-                        <p>تاریخ درخواست مرخصی</p>
-                        <DateRangePicker
-                            localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
-                            id="leave_date"
-                            label="تاریخ مرخصی"
-                            value={filter.leaveDate}
-                            onChange={newValue => setFilter({...filter, leaveDate: newValue})}>
-
-
-                        </DateRangePicker>
-                    </FormControl>
-
-                    <TextField
-                        value={filter.name}
-                        label='نام پرسنل'
-                        id='employeeNameSearch'
-                        name='employeeNameSearch'
-                        autoComplete='name'
-                        onChange={(e) =>
-                            setFilter({...filter, name: e.target.value})}>
-                    </TextField>
-
-                    <FormControl sx={{
-                        minWidth: '150px'
-                    }}>
-                        <InputLabel id="type-label">وضعیت</InputLabel>
-                        <Select
-                            autoWidth
-                            value={filter.status}
-                            onChange={(e) => setFilter({...filter, status: e.target.value})}
-                            label="وضعیت"
-                            autoFocus
-                        >
-                            <MenuItem value={'all'}>همه</MenuItem>
-                            <MenuItem value={'pending'}>در حال بررسی</MenuItem>
-                            <MenuItem value={'accepted'}>تایید شده</MenuItem>
-                            <MenuItem value={'declined'}>رد شده</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    <IconButton
-                        sx={{
-                            width: '54px'
-                        }}
-                        size="large"
-                        aria-label="refresh"
-                        onClick={fetchRequests}
-                    >
-                        <RefreshIcon></RefreshIcon>
-                    </IconButton>
-                </Box>
-                <Box sx={{marginTop: '8px'}}>
-                    <RequestsDataGrid onSelectedRowsChanged={handleSelectedRowsChanged}
-                                      filters={filter}
-                                      data={data}
-                                      onModifyRequest={requestModifyHandler}
-                    >
-                    </RequestsDataGrid>
-                </Box>
-                <Box sx={{
-                    marginTop: '8px',
-                    display: 'flex',
-                    gap: '8px'
-                }}>
-                    <Button disabled={selectedRows.length === 0}
-                            variant='contained'
-                            onClick={() => {
-                                openConfirmModal('accepted')
-                            }}
-                            color='success'>
-                        تایید همه
-                    </Button>
-                    <Button disabled={selectedRows.length === 0}
-                            variant='contained'
-                            onClick={() => {
-                                openConfirmModal('declined')
-                            }}
-                            color='error'>
-                        رد همه
-                    </Button>
-                </Box>
+                        </RequestsDataGrid>
+                    </Grid>
+                    <Grid xs={12} sm={6} md={3}>
+                        <Button disabled={selectedRows.length === 0}
+                                fullWidth
+                                variant='contained'
+                                onClick={() => {
+                                    setConfirmModalOpen('true');
+                                    setConfirmStatus('accepted');
+                                }}
+                                color='primary'>
+                            تایید همه
+                        </Button>
+                    </Grid>
+                    <Grid xs={12} sm={6} md={3}>
+                        <Button disabled={selectedRows.length === 0}
+                                fullWidth
+                                variant='contained'
+                                onClick={() => {
+                                    setConfirmModalOpen('true');
+                                    setConfirmStatus('declined');
+                                }}
+                                color='primary'>
+                            رد همه
+                        </Button>
+                    </Grid>
+                </Grid>
             </Box>
-
             <Modal
                 open={confirmModalOpen}
                 onClose={() => setConfirmModalOpen(false)}>
                 <Box sx={{...style, width: 400}}>
-                    <h2 id="parent-modal-title">{confirmStatus}{' درخواست ها'}</h2>
+                    <h2 id="parent-modal-title">
+                        {confirmStatus === 'accepted' ? ' تایید ' : ' رد '}
+                        {' درخواست ها'}</h2>
                     <p id="parent-modal-description">
-                        آیا از {confirmStatus} {selectedRows.length} درخواست مطمعن هستید؟
-
+                        آیا از
+                        {confirmStatus === 'accepted' ? ' تایید ' : ' رد '}
+                        {selectedRows.length}
+                        {' '}
+                        درخواست مطمعن هستید؟
                     </p>
                     <Button
                         sx={{
                             marginLeft: '8px'
                         }}
-                        disabled={selectedRows.length === 0}
                         variant='contained'
                         onClick={async () => {
-                            await modifyMultipleRequests('accepted');
+                            await modifyMultipleRequests(confirmStatus);
                             setConfirmModalOpen(false)
                         }}
-                        color='success'>
+                        color='primary'>
                         بله
                     </Button>
                     <Button
                         sx={{
                             marginLeft: '8px'
                         }}
-                        disabled={selectedRows.length === 0}
-                        variant='contained'
+                        variant='outlined'
                         onClick={() => setConfirmModalOpen(false)}
-                        color='error'>
+                        color='secondary'>
                         خیر
                     </Button>
                 </Box>
             </Modal>
-
 
         </LocalizationProvider>
 
