@@ -1,35 +1,56 @@
-import EmployeeMiniDrawer from "./EmployeeMiniDrawer";
-import ManagerMiniDrawer from "./ManagerMiniDrawer";
-import GuestMiniDrawer from "./GuestMiniDrawer";
 import UserContext from "../../Contexts/UserContext";
 import {useContext, useEffect, useState} from "react";
-import MAAMiniDrawer from "./MAAMiniDrawer";
-import EAAMiniDrawer from "./EAAMiniDrawer";
-import SuperAdminDrawer from "./SuperAdminDrawer";
+import {Button} from "@mui/material";
+import CustomDrawer from "./CustomDrawer";
+import Api from "../../Api";
+import CurrentPageContext from "../../Contexts/CurrentPageContext";
+import {useNavigate} from "react-router-dom";
 
 function MainDrawer() {
     const user = useContext(UserContext);
-    const [navBarUser, setNavBarUser] = useState({});
-
-
-    function nav() {
-        if (navBarUser !== undefined) {
-            if (navBarUser.roll === 'employee') return <EmployeeMiniDrawer/>
-            else if (navBarUser.roll === 'manager') return <ManagerMiniDrawer/>
-            else if (navBarUser.roll === 'expertAdministrativeAffairs') return <EAAMiniDrawer/>
-            else if (navBarUser.roll === 'managerAdministrativeAffairs') return <MAAMiniDrawer/>
-            else if (navBarUser.roll === 'superAdmin') return <SuperAdminDrawer/>
-            else return <GuestMiniDrawer/>
-        } else return <GuestMiniDrawer/>
-    }
+    const [mainDrawerUser, setMainDrawerUser] = useState({});
+    const [test, setTest] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        user.current = {navBarUser, setNavBarUser};
-    }, [navBarUser, user]);
+        console.log('updating');
+        getUser();
+        user.current = {
+            mainDrawerUser: mainDrawerUser, setMainDrawerUser: setUser
+        }
+    }, [])
+
+    function setUser(newUser) {
+        if (newUser.roll === undefined) {
+            setMainDrawerUser(newUser);
+        } else if (newUser !== mainDrawerUser) {
+            setMainDrawerUser(newUser);
+            user.current = {...user.current, mainDrawerUser: newUser}
+            console.log(newUser)
+        }
+    }
+
+    async function getUser() {
+        try {
+            console.log('fetching user')
+            let response = await Api.get('/auth/');
+            setUser(response.data);
+        } catch (error) {
+            if (error.response) {
+                // handle error response
+                if (error.response.status === 401) {
+                    setUser({});
+                }
+            }
+        }
+    }
+
+
     return (
         <>
             {
-                nav()
+                user.current.mainDrawerUser !== undefined ?
+                    <CustomDrawer roll={user.current.mainDrawerUser.roll}/> : ''
             }
         </>
     )
