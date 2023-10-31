@@ -19,11 +19,11 @@ import MiniDrawer from "../Drawer";
 import {Box} from "@mui/material";
 import {Outlet} from "react-router-dom";
 
-function CustomDrawer({roll}) {
+function CustomDrawer({role}) {
     const [pages, setPages] = useState([]);
     const [sections, setSections] = useState([]);
     useEffect(() => {
-        if (roll === 'managerAdministrativeAffairs') {
+        if (role === 'managerAdministrativeAffairs') {
             setPages([
                 {
                     path: '/panel',
@@ -97,7 +97,7 @@ function CustomDrawer({roll}) {
                     icon: <LogoutIcon/>
                 }
             ])
-        } else if (roll === 'expertAdministrativeAffairs') {
+        } else if (role === 'expertAdministrativeAffairs') {
             setPages([
                 {
                     path: '/panel',
@@ -145,7 +145,7 @@ function CustomDrawer({roll}) {
                     icon: <GavelIcon/>
                 },
             ]);
-        } else if (roll === 'manager') {
+        } else if (role === 'manager') {
             setPages([
                 {
                     path: '/panel',
@@ -185,7 +185,7 @@ function CustomDrawer({roll}) {
                     icon: <LogoutIcon/>
                 }
             ])
-        } else if (roll === 'superAdmin') {
+        } else if (role === 'superAdmin') {
             setPages([
                 {
                     path: '/panel/manager/attendance-leaves',
@@ -235,7 +235,7 @@ function CustomDrawer({roll}) {
                     icon: <LogoutIcon/>
                 }
             ])
-        } else if (roll === 'employee') {
+        } else if (role === 'employee') {
             setPages([
                 {
                     path: '/panel',
@@ -291,7 +291,7 @@ function CustomDrawer({roll}) {
                 },
             ]);
         }
-    }, [roll])
+    }, [role])
 
     return (
         <>

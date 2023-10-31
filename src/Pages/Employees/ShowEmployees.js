@@ -6,22 +6,11 @@ import {
 } from "@mui/material";
 import Api from "../../Api";
 import EmployeesDataGrid from "./EmployeesDataGrid";
+import useEmployees from "../../Hooks/useEmployees";
 
 function ShowEmployees() {
-    const [employees, setEmployees] = useState({rows: []});
-    useEffect(() => {
-        async function getEmployees() {
-            const response = await Api.get('/employees');
-            // handle successful response
-            let data = response.data.data;
-            setEmployees({
-                rows: data
-            });
-        }
-
-        getEmployees();
-    }, [])
-
+    const {employeesIsLoading, employees} = useEmployees();
+    console.log(employees ?? [])
 
     return (
         <Box>
@@ -33,10 +22,9 @@ function ShowEmployees() {
 
             </Typography>
             <Container disableGutters sx={{py: {xs: 1, sm: 2}}}>
-
                 <EmployeesDataGrid
-                    data={employees}>
-
+                    loading={employeesIsLoading}
+                    data={{rows: employees ?? []}}>
                 </EmployeesDataGrid>
             </Container>
         </Box>

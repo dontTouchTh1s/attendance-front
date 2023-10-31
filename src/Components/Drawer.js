@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {useContext, useEffect, useState} from 'react';
 import {styled, useTheme} from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -17,9 +16,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import {Link} from "react-router-dom";
-import CurrentPageContext from "../Contexts/CurrentPageContext";
-import HomeIcon from '@mui/icons-material/Home';
+import {Link, useLocation} from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -91,11 +88,7 @@ const Drawer = styled(MuiDrawer, {shouldForwardProp: (prop) => prop !== 'open'})
 export default function MiniDrawer({pages, section, children}) {
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
-    const [navBarCurrentPage, setNavBarCurrentPage] = useState('');
-    const currentPage = useContext(CurrentPageContext);
-    useEffect(() => {
-        currentPage.current = {navBarCurrentPage, setNavBarCurrentPage};
-    }, [])
+    const currentPage = useLocation().pathname;
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -135,12 +128,10 @@ export default function MiniDrawer({pages, section, children}) {
                 <Divider/>
                 <List>
 
-                    {pages.map((page, index) => (
+                    {pages.map((page) => (
+
                         <ListItem key={page.title} disablePadding sx={{display: 'block'}}>
                             <Link
-                                onClick={() => {
-                                    setNavBarCurrentPage(page.path)
-                                }}
                                 to={page.path}
                                 style={{
                                     textDecoration: 'none ',
@@ -157,7 +148,7 @@ export default function MiniDrawer({pages, section, children}) {
                                 >
                                     <ListItemIcon
                                         sx={{
-                                            color: navBarCurrentPage === page.path ? 'blue' : '#0000008a',
+                                            color: currentPage === page.path ? 'blue' : '#0000008a',
                                             minWidth: 0,
                                             mr: open ? 3 : 'auto',
                                             justifyContent: 'center',
@@ -167,7 +158,7 @@ export default function MiniDrawer({pages, section, children}) {
                                     </ListItemIcon>
                                     <ListItemText primary={page.title} sx={{
                                         opacity: open ? 1 : 0,
-                                        color: navBarCurrentPage === page.path ? 'blue' : 'inherit'
+                                        color: currentPage === page.path ? 'blue' : 'inherit'
                                     }}/>
                                 </ListItemButton>
                             </Link>
@@ -179,9 +170,6 @@ export default function MiniDrawer({pages, section, children}) {
                     {section.map((page, index) => (
                         <ListItem key={page.title} disablePadding sx={{display: 'block'}}>
                             <Link
-                                onClick={() => {
-                                    setNavBarCurrentPage(page.path)
-                                }}
                                 to={page.path}
                                 style={{
                                     textDecoration: 'none ',
@@ -198,7 +186,7 @@ export default function MiniDrawer({pages, section, children}) {
                                 >
                                     <ListItemIcon
                                         sx={{
-                                            color: navBarCurrentPage === page.path ? 'blue' : '#0000008a',
+                                            color: currentPage === page.path ? 'blue' : '#0000008a',
                                             minWidth: 0,
                                             mr: open ? 3 : 'auto',
                                             justifyContent: 'center',
@@ -208,7 +196,7 @@ export default function MiniDrawer({pages, section, children}) {
                                     </ListItemIcon>
                                     <ListItemText primary={page.title} sx={{
                                         opacity: open ? 1 : 0,
-                                        color: navBarCurrentPage === page.path ? 'blue' : 'inherit'
+                                        color: currentPage === page.path ? 'blue' : 'inherit'
                                     }}/>
                                 </ListItemButton>
                             </Link>

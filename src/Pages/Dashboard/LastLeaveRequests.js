@@ -7,10 +7,7 @@ import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
 import moment from "moment-jalaali";
 
 function LastLeaveRequests({leaveRequests, employeeWorkHour}) {
-    console.log(leaveRequests);
     const leaveRequestsCard = leaveRequests.map(lr => {
-            console.log(lr);
-            console.log(employeeWorkHour)
             let leaveType = lr.from_hour !== employeeWorkHour.start && lr.to_hour !== employeeWorkHour.end ? 'ساعتی' : 'روزانه';
             let statusText = 'رد شده';
             let statusColor = 'error';
@@ -21,10 +18,8 @@ function LastLeaveRequests({leaveRequests, employeeWorkHour}) {
                 statusText = 'تایید شده';
                 statusColor = 'success';
             }
-
-
             return (
-                <Grid xs={11} sm={5.5} md={3.6} sx={{
+                <Grid key={lr.id} xs={11} sm={5.5} md={3.6} sx={{
                     flexShrink: 0,
                 }}>
                     <Card sx={{

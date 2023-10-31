@@ -1,8 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Avatar, Box, Card, Container, Paper, switchClasses, Typography} from "@mui/material";
+import {Avatar, Box, Paper, Stack, Typography} from "@mui/material";
 import {BarChart} from "@mui/x-charts";
 import Api from "../../Api";
-import Grid2 from "@mui/material/Unstable_Grid2";
 import Grid from "@mui/material/Unstable_Grid2";
 import PersonIcon from '@mui/icons-material/Person';
 import UserContext from "../../Contexts/UserContext";
@@ -11,81 +10,61 @@ import moment from "moment-jalaali";
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import LastLeaveRequests from "./LastLeaveRequests";
 import "../../Theme/custom-scrollbar.css";
+import Skeleton from '@mui/material/Skeleton';
+import useSWR from "swr";
+import LoadingCircle from "../../Components/LoadingCircle";
+import {styled} from "@mui/material/styles";
+import useSWRImmutable from "swr/immutable";
+
+
+const IconBox = styled(Box)({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+});
+
+async function fetcher(url) {
+    return Api.get(url).then(response => response.data);
+}
+
+async function requestsFetcher([url, params]) {
+    return Api.get(url, {params: params}).then(response => response.data);
+}
 
 function Dashboard() {
+    const {data: employee} = useSWRImmutable('/auth/employee', fetcher);
+    const {data: lastLeaveRequests} = useSWRImmutable(() => ['/leave-requests', employee.id ? {
+        'employee_id': employee.id,
+        'count': 5,
+        'order_by': 'id',
+        'order_option': 'DESC'
+    } : false], (url, params) => requestsFetcher(url, params), {revalidateOnMount: true})
+    const {data: leaveRequests} = useSWRImmutable(() => ['/leave-requests/group-by-month', employee.id ? {
+        'employee_id': employee.id
+    } : false], (url, params) => requestsFetcher(url, params), {revalidateOnMount: true});
+    const {data: workPlace} = useSWRImmutable('/auth/employee/group-policy/work-place', fetcher);
+    const {data: groupPolicy} = useSWRImmutable('/auth/employee/group-policy', fetcher);
     const [months, setMonths] = useState([]);
     const [counts, setCounts] = useState([]);
-    const [employee, setEmployee] = useState([]);
-    const [groupPolicy, setGroupPolicy] = useState([]);
-    const [workPlace, setWorkPlace] = useState([]);
-    const [lastLeaveRequests, setLastLeaveRequests] = useState([]);
+
     const user = useContext(UserContext);
 
-    async function fetchLeaveRequests() {
-        try {
-            const response = await Api.get('/leave-requests');
-            setMonths(response.data.map((l) =>
-                l.month
-            ));
-            setCounts(response.data.map((l) =>
-                parseInt(l.time)
-            ));
-            // handle successful response
-        } catch (error) {
-            console.log(error)
-        }
-
-    }
-
-    async function fetchEmployee() {
-        try {
-            const response = await Api.get('/auth/employee');
-            await fetchLastLeaveRequests(response.data.id);
-            setEmployee(response.data);
-        } catch (e) {
-
-        }
-    }
-
-    async function fetchGroupPolicy() {
-        try {
-            const response = await Api.get('/auth/employee/group-policy');
-            setGroupPolicy(response.data);
-        } catch (e) {
-
-        }
-    }
-
-    async function fetchWorkPlace() {
-        try {
-            const response = await Api.get('/auth/employee/group-policy/work-place');
-            setWorkPlace(response.data);
-        } catch (e) {
-
-        }
-    }
-
-    async function fetchLastLeaveRequests(id) {
-        let data = {
-            'employee_id': id,
-            'count': 5,
-            'order_by': 'id',
-            'order_option': 'DESC'
-        };
-        try {
-            const response = await Api.get('/leave-requests', {params: data});
-            setLastLeaveRequests(response.data);
-        } catch (e) {
-
-        }
-    }
 
     useEffect(() => {
-        fetchLeaveRequests();
-        fetchEmployee();
-        fetchGroupPolicy();
-        fetchWorkPlace();
-    }, [])
+        function generateChartProps() {
+            setMonths(leaveRequests.map((l) =>
+                l.month
+            ));
+            setCounts(leaveRequests.map((l) =>
+                parseInt(l.time)
+            ));
+        }
+
+        if (leaveRequests) {
+            generateChartProps();
+        }
+    }, [leaveRequests])
+
     return (
         <Box>
             <Typography component="h1" variant="h4">
@@ -104,28 +83,40 @@ function Dashboard() {
                                 variant={'outlined'}>
                                 <Grid container>
                                     <Grid xs={12} md={1}>
-                                        <Avatar sx={{}}>
-                                            <PersonIcon fontSize={'large'}/>
-                                        </Avatar>
+                                        {
+                                            !employee ?
+                                                <Skeleton variant={"circular"} height={50} width={50}/>
+                                                :
+                                                <Avatar sx={{}}>
+                                                    <PersonIcon fontSize={'large'}/>
+                                                </Avatar>
+                                        }
                                     </Grid>
                                     <Grid xs={12} md={11}>
-                                        <Typography component="p" variant="h6">
-                                            {employee.first_name}
-                                            {' '}
-                                            {employee.last_name}
-                                        </Typography>
-                                        <Typography component="p" variant="p">
-                                            {
-                                                user.current.navBarUser.roll === 'managerAdministrativeAffairs' ?
-                                                    'مدیر امور اداری' :
-                                                    user.current.navBarUser.roll === 'expertAdministrativeAffairs' ?
-                                                        'کارشناس امور اداری' :
-                                                        user.current.navBarUser.roll === 'manager' ?
-                                                            'سرپرست' :
-                                                            user.current.navBarUser.roll === 'employee' ?
-                                                                'کارمند' : ''
-                                            }
-                                        </Typography>
+                                        {
+                                            !employee ?
+                                                <Skeleton height={25} width={120}/>
+                                                :
+                                                <>
+                                                    <Typography component="p" variant="h6">
+                                                        {employee.first_name}
+                                                        {' '}
+                                                        {employee.last_name}
+                                                    </Typography>
+                                                    <Typography component="p" variant="p">
+                                                        {
+                                                            user.current.role === 'managerAdministrativeAffairs' ?
+                                                                'مدیر امور اداری' :
+                                                                user.current.role === 'expertAdministrativeAffairs' ?
+                                                                    'کارشناس امور اداری' :
+                                                                    user.current.role === 'manager' ?
+                                                                        'سرپرست' :
+                                                                        user.current.role === 'employee' ?
+                                                                            'کارمند' : ''
+                                                        }
+                                                    </Typography>
+                                                </>
+                                        }
                                     </Grid>
                                 </Grid>
                             </Paper>
@@ -141,34 +132,86 @@ function Dashboard() {
                                           overflowX: 'scroll',
                                           pt: 1
                                       }}>
-                                    <LastLeaveRequests
-                                        leaveRequests={lastLeaveRequests}
-                                        employeeWorkHour={{
-                                            start: groupPolicy.work_start_hour,
-                                            end: groupPolicy.work_end_hour
-                                        }}
-                                    >
+                                    {
+                                        !lastLeaveRequests ?
+                                            <>
+                                                <Stack p={1} pt={3}>
+                                                    <Box p={1}>
+                                                        <Skeleton variant="h6"/>
+                                                    </Box>
+                                                    <Stack direction={'row'} spacing={1} p={1}>
+                                                        <Skeleton variant="rounded" width={77} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                        <Skeleton variant="rounded" width={60} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                        <Skeleton variant="rounded" width={54} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                    </Stack>
+                                                    <Box p={1}>
+                                                        <Skeleton variant="rounded" width={220} height={60}/>
+                                                    </Box>
+                                                    <Stack p={1} spacing={1}>
+                                                        <Skeleton height={10}/>
+                                                        <Skeleton height={10}/>
+                                                        <Skeleton height={10} width={'80%'}/>
+                                                    </Stack>
+                                                </Stack>
+                                                <Stack pt={3}>
+                                                    <Box p={1}>
+                                                        <Skeleton variant="h6"/>
+                                                    </Box>
+                                                    <Stack direction={'row'} spacing={1} p={1}>
+                                                        <Skeleton variant="rounded" width={77} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                        <Skeleton variant="rounded" width={60} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                        <Skeleton variant="rounded" width={54} height={32}
+                                                                  sx={{borderRadius: '20px'}}/>
+                                                    </Stack>
+                                                    <Box p={1}>
+                                                        <Skeleton variant="rounded" width={220} height={60}/>
+                                                    </Box>
+                                                    <Stack p={1} spacing={1}>
+                                                        <Skeleton height={10}/>
+                                                        <Skeleton height={10}/>
+                                                        <Skeleton height={10} width={'80%'}/>
+                                                    </Stack>
+                                                </Stack>
+                                            </> :
+                                            <LastLeaveRequests
+                                                leaveRequests={lastLeaveRequests}
+                                                employeeWorkHour={{
+                                                    start: groupPolicy.work_start_hour,
+                                                    end: groupPolicy.work_end_hour
+                                                }}
+                                            >
 
-                                    </LastLeaveRequests>
+                                            </LastLeaveRequests>
+                                    }
+
+
                                 </Grid>
                             </Grid>
                             <Grid xs={12}>
-                                {
-                                    counts.length !== 0 ?
-                                        <BarChart sx={{
-                                            width: '100%'
-                                        }}
-
-                                                  xAxis={[{scaleType: 'band', data: months}]}
-                                                  series={[{
-                                                      data: counts,
-                                                      label: 'مرخصی ها در ماه های گذشته',
-                                                      type: 'bar'
-                                                  }]}
-                                                  width={500}
-                                                  height={300}
-                                        /> : 'داده ای وجود ندارد'
-                                }
+                                <Box sx={{display: 'flex', justifyContent: 'center', minHeight: 300}}>
+                                    {
+                                        leaveRequests ?
+                                            counts.length !== 0 ?
+                                                <BarChart sx={{
+                                                    width: '100%'
+                                                }}
+                                                          xAxis={[{scaleType: 'band', data: months}]}
+                                                          series={[{
+                                                              data: counts,
+                                                              label: 'مرخصی ها در ماه های گذشته',
+                                                              type: 'bar'
+                                                          }]}
+                                                          width={500}
+                                                          height={300}
+                                                /> : 'داده ای وجود ندارد' :
+                                            <LoadingCircle/>
+                                    }
+                                </Box>
                             </Grid>
                         </Grid>
                     </Grid>
@@ -181,30 +224,45 @@ function Dashboard() {
                                 {'گروه سیاست کاری'}
                             </Typography>
                             <Typography component="p" variant="h6">
-                                {groupPolicy.name}
+                                {
+                                    groupPolicy ?
+                                        groupPolicy.name :
+                                        <Skeleton variant={'h6'} animation={'wave'}/>
+                                }
                             </Typography>
-                            <Box sx={{
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
+                            <IconBox>
                                 <AccessTimeIcon/>
-                                <Typography component="p" variant="p">
+                                <Typography component="span" variant="body1">
                                     {'ساعت کاری: '}
-                                    {moment("2022-02-02T" + groupPolicy.work_start_hour).format('HH:mm')}
-                                    {' تا '}
-                                    {moment("2022-02-02T" + groupPolicy.work_end_hour).format('HH:mm')}
                                 </Typography>
-                            </Box>
-                            <Box sx={{
-                                display: 'flex',
-                                gap: '8px'
-                            }}>
+                                {
+                                    groupPolicy ?
+                                        <Typography component="span" variant="body1">
+                                            {
+                                                moment("2022-02-02T" + groupPolicy.work_start_hour).format('HH:mm') +
+                                                ' تا '
+                                                + moment("2022-02-02T" + groupPolicy.work_end_hour).format('HH:mm')
+
+                                            }
+                                        </Typography> :
+                                        <Skeleton variant={'rounded'} height={10} animation={'wave'}
+                                                  sx={{flexGrow: 1}}/>
+                                }
+                            </IconBox>
+                            <IconBox>
                                 <ApartmentIcon/>
-                                <Typography component="p" variant="p">
+                                <Typography component="span" variant="body1">
                                     {'محل کار: '}
-                                    {workPlace.name}
                                 </Typography>
-                            </Box>
+                                {
+                                    workPlace ?
+                                        <Typography component="span" variant="body1">
+                                            {workPlace.name}
+                                        </Typography> :
+                                        <Skeleton variant={'rounded'} height={10} animation={'wave'}
+                                                  sx={{flexGrow: 1}}/>
+                                }
+                            </IconBox>
                         </Paper>
                     </Grid>
                 </Grid>

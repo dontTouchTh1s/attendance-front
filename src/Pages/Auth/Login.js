@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Box, Container, CssBaseline, InputAdornment, Snackbar, TextField, Typography} from "@mui/material";
 import Api from "../../Api";
 import {useNavigate} from "react-router-dom";
@@ -9,9 +9,10 @@ import {Visibility, VisibilityOff} from "@mui/icons-material";
 import {Alert} from "@mui/lab";
 
 function Login() {
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate();
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorText, setPasswordErrorText] = useState('');
     const [emailError, setEmailError] = useState(false);

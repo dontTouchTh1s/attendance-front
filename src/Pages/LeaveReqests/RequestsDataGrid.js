@@ -264,9 +264,9 @@ function RequestsDataGrid({onSelectedRowsChanged, selectedRows, filters, data, o
                 return (
                     <Box sx={{width: '100%'}}>
                         <Button
-                            disabled={user.current.navBarUser.roll === 'manager' && params.row.status !== 'pending'}>تایید</Button>
+                            disabled={user.current.mainDrawerUser.role === 'manager' && params.row.status !== 'pending'}>تایید</Button>
                         <Button
-                            disabled={user.current.navBarUser.roll === 'manager' && params.row.status !== 'pending'}
+                            disabled={user.current.mainDrawerUser.role === 'manager' && params.row.status !== 'pending'}
                             color={'error'}
                             onClick={(event) => acceptDeclineRequest(event, params.id, 'declined')}>رد</Button>
                     </Box>
@@ -318,11 +318,11 @@ function RequestsDataGrid({onSelectedRowsChanged, selectedRows, filters, data, o
                         {clickedRowParams.row.description}
                     </p>
                     <Button
-                        disabled={user.current.navBarUser.roll === 'manager' && clickedRowParams.row.status !== 'pending'}
+                        disabled={user.current.role === 'manager' && clickedRowParams.row.status !== 'pending'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'accepted')}>تایید
                     </Button>
                     <Button
-                        disabled={user.current.navBarUser.roll === 'manager' && clickedRowParams.row.status !== 'pending'}
+                        disabled={user.current.role === 'manager' && clickedRowParams.row.status !== 'pending'}
                         color={'error'}
                         onClick={(event) => acceptDeclineRequest(event, clickedRowParams.row.id, 'declined')}>رد
                     </Button>

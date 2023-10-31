@@ -1,6 +1,7 @@
 import {createTheme} from "@mui/material/styles";
 import {faIR} from "@mui/material/locale";
 import {faIR as dataGridFaIR} from "@mui/x-data-grid";
+import './rtl-css.css';
 
 export const theme = createTheme(
     {

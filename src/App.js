@@ -1,26 +1,23 @@
-import './App.css';
 import React, {useRef} from "react";
-import {CssBaseline, ThemeProvider} from "@mui/material";
+import {Box, CssBaseline, ThemeProvider} from "@mui/material";
 import RTL from "./Theme/RTL";
 import {theme} from "./Theme/rtl-theme";
-import CurrentPageContext from "./Contexts/CurrentPageContext";
 import UserContext from "./Contexts/UserContext";
-
 import MainDrawer from "./Components/MiniDrawers/MainDrawer";
+import {Outlet} from "react-router-dom";
 
 function App() {
-    const currentPage = useRef({});
-    const user = useRef({user: {}});
-
+    const user = useRef({
+        mainDrawerUser: null, setMainDrawerUser: () => {
+        }
+    });
     return (
         <RTL>
             <ThemeProvider theme={theme}>
                 <CssBaseline/>
                 <UserContext.Provider value={user}>
-                    <CurrentPageContext.Provider value={currentPage}>
-                        <MainDrawer>
-                        </MainDrawer>
-                    </CurrentPageContext.Provider>
+                    <MainDrawer>
+                    </MainDrawer>
                 </UserContext.Provider>
             </ThemeProvider>
         </RTL>

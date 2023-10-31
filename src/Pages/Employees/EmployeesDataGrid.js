@@ -20,7 +20,7 @@ const style = {
 };
 
 
-function EmployeesDataGrid({data}) {
+function EmployeesDataGrid({data, loading}) {
     const [modalObjectionOpen, setModalObjectionOpen] = useState(false);
     const [clickedRowParams, setClickedRowParams] = useState({row: {}});
     const [description, setDescription] = useState('');
@@ -103,6 +103,7 @@ function EmployeesDataGrid({data}) {
                 onRowClick={(gridRowParams) => {
                     setClickedRowParams(gridRowParams)
                 }}
+                loading={loading}
             >
             </DataGridPro>
             <Modal

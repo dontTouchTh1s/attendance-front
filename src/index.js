@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -13,7 +12,7 @@ import "./Api"
 import CreateLeaveRequest from "./Pages/CreateRquest/CreateRequest";
 import CreateWorkPlace from "./Pages/WorkPlace/CreateWorkPlace";
 import Dashboard from "./Pages/Dashboard/Dashboard";
-import ProtectedRoute from "./Components/ProtectedRoute";
+import ProtectedRoute, {loader as protectedRouteLoader} from "./Components/ProtectedRoute";
 import AlreadyLogin from "./Components/AlreadyLogin";
 import ShowAttendanceLeavesManager from "./Pages/AttendanceLeave/ShowAttendanceLeavesManager";
 import CreateGroupPolicy from "./Pages/GroupPolicies/CreateGroupPolicy";
@@ -29,6 +28,7 @@ import ShowEmployees from "./Pages/Employees/ShowEmployees";
 import CreateEmployee from "./Pages/CreateEmployee/CreateEmployee";
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import {StrictMode} from "react";
+import StartBusiness from "./Pages/StartBusiness/StartBusiness";
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
@@ -46,24 +46,14 @@ function handlePermission() {
         result.addEventListener("change", () => {
         });
     });
-
-
 }
-
-async function getCsrf() {
-    try {
-        await Api.get('http://localhost:8000/sanctum/csrf-cookie');
-    } catch (error) {
-        console.log("error while connecting to server");
-        console.log(error.response);
-    }
-}
-
-await getCsrf();
 
 const geoOptions = {enableHighAccuracy: false, maximumAge: 0,};
 locationTracker(geoOptions);
 
+const minRoleEmployee = ['employee', 'manager', 'EAA', 'MAA', 'superAdmin'];
+const minRoleManager = ['manager', 'EAA', 'MAA', 'superAdmin'];
+const minRoleExpertAdmin = ['EAA', 'MAA', 'superAdmin'];
 
 handlePermission();
 const router = createBrowserRouter([
@@ -80,91 +70,110 @@ const router = createBrowserRouter([
             {
                 path: "/login",
                 element: <AlreadyLogin><Login/></AlreadyLogin>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/sing-up",
-                element: <AlreadyLogin><SingUp/></AlreadyLogin>
+                element: <AlreadyLogin><SingUp/></AlreadyLogin>,
+                loader: protectedRouteLoader
             },
             // User routes
             {
-                path: "/panel/",
-                element: <ProtectedRoute><Dashboard/></ProtectedRoute>,
+                path: "/panel",
+                element: <ProtectedRoute requiredRole={minRoleEmployee}><Dashboard/></ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/create-leave-request",
-                element: <ProtectedRoute><CreateLeaveRequest/></ProtectedRoute>
+                element: <ProtectedRoute requiredRole={minRoleEmployee}><CreateLeaveRequest/></ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/attendance-leaves",
-                element: <ProtectedRoute><ShowAttendanceLeaves/></ProtectedRoute>
+                element: <ProtectedRoute requiredRole={minRoleEmployee}><ShowAttendanceLeaves/></ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/objections",
-                element: <ProtectedRoute><ShowObjections/></ProtectedRoute>
+                element: <ProtectedRoute requiredRole={minRoleEmployee}><ShowObjections/></ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/logout",
-                element: <ProtectedRoute><Logout/></ProtectedRoute>
+                element: <ProtectedRoute requiredRole={minRoleEmployee}><Logout/></ProtectedRoute>,
+                loader: protectedRouteLoader
             },
 
             // Manager routes
             {
                 path: "/panel/manager/leave-requests",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleManager}>
                     <LeaveRequests/>
-                </ProtectedRoute>
+                </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/attendance-leaves",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleManager}>
                     <ShowAttendanceLeavesManager/>
                 </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/create-group-policy",
                 element: <ProtectedRoute
-                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleExpertAdmin}>
                     <CreateGroupPolicy/>
                 </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/create-penalty-condition",
                 element: <ProtectedRoute
-                    requiredRoll={['expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleExpertAdmin}>
                     <CreatePenaltyCondition/>
                 </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/objections",
                 element: <ProtectedRoute
-                    requiredRoll={['manager', 'expertAdministrativeAffairs', 'managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleManager}>
                     <ShowObjectionsManager/>
-                </ProtectedRoute>
+                </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/work-places",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={['managerAdministrativeAffairs', 'superAdmin']}>
                     <CreateWorkPlace/>
-                </ProtectedRoute>
+                </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/employees",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs', 'expertAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={minRoleExpertAdmin}>
                     <ShowEmployees/>
-                </ProtectedRoute>
+                </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
             {
                 path: "/panel/manager/create-employee",
                 element: <ProtectedRoute
-                    requiredRoll={['managerAdministrativeAffairs', 'superAdmin']}>
+                    requiredRole={['managerAdministrativeAffairs', 'superAdmin']}>
                     <CreateEmployee/>
-                </ProtectedRoute>
+                </ProtectedRoute>,
+                loader: protectedRouteLoader
             },
         ],
+    },
+    {
+        path: '/start-business',
+        element: <StartBusiness/>
     }
 ]);
 

@@ -7,14 +7,12 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 
 function SingUp() {
-
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [cPassword, setCPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
 
     async function handleSubmit(e) {
         e.preventDefault();
