@@ -1,28 +1,31 @@
-import React, {useEffect, useState} from 'react';
-
+import React, {useState} from 'react';
 import {
     Box,
-    Button,
     Container,
     FormControl, FormHelperText, InputAdornment,
     InputLabel,
     MenuItem,
-    Paper,
     Select, Snackbar,
     TextField,
-    Typography
+    Typography,
+    FormControlLabel, Checkbox
 } from "@mui/material";
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import Grid from '@mui/material/Unstable_Grid2';
 import Api from "../../Api";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Alert} from "@mui/lab";
+import LoadingCircle from "../../Components/LoadingCircle";
+import useGroupPolicies from "../../Hooks/useGroupPolicies";
+
 
 function CreatePenaltyCondition() {
+    const {groupPolicies, groupPoliciesError, groupPoliciesIsLoading} = useGroupPolicies();
     const [type, setType] = useState('delay');
     const [duration, setDuration] = useState('');
     const [penalty, setPenalty] = useState('');
     const [groupPolicy, setGroupPolicy] = useState('');
-    const [groupPolicies, setGroupPolicies] = useState([]);
+    const [penaltyType, setPenaltyType] = useState('paid');
+    const [penaltyIfNoLeaveRemains, setPenaltyIfNoLeaveRemains] = useState(true);
     const [typeTitle, setTypeTitle] = useState('تاخیر');
 
     const [groupPolicyError, setGroupPolicyError] = useState('');
@@ -33,6 +36,7 @@ function CreatePenaltyCondition() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarType, setSnackbarType] = useState('error');
+
 
     function handleTypeChange(e) {
         setType(e.target.value)
@@ -63,7 +67,9 @@ function CreatePenaltyCondition() {
             'type': type,
             'duration': duration,
             'penalty': penalty,
-            'group_policy_id': groupPolicy
+            'group_policy_id': groupPolicy,
+            'penalty_type': penaltyType,
+            'penalty_if_no_leave_remains': penaltyIfNoLeaveRemains
         };
         try {
             setCreatePenaltyConditionLoading(true);
@@ -82,21 +88,6 @@ function CreatePenaltyCondition() {
             setSnackbarType('error');
         }
 
-    }
-
-    useEffect(() => {
-        fetchGroupPolicies();
-    }, [])
-
-    async function fetchGroupPolicies() {
-        try {
-            const response = await Api.get('/group-policies');
-            // handle successful response
-            setGroupPolicies(response.data);
-
-        } catch (error) {
-
-        }
     }
 
     function handleFormError() {
@@ -184,9 +175,18 @@ function CreatePenaltyCondition() {
                                 onChange={(e) => setGroupPolicy(e.target.value)}
                                 label="گروه سیاست کاری"
                             >
-                                {groupPolicies.map(gp =>
-                                    <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
-                                )}
+                                {
+                                    groupPoliciesError ?
+                                        <Box sx={{py: 1, px: 2}}>
+                                            <Typography component={'span'} variant={'body1'} color={'red'}>
+                                                {'خطا در هنگام بارگیری!'}
+                                            </Typography>
+                                        </Box> :
+                                        !groupPoliciesIsLoading ?
+                                            groupPolicies.map(gp =>
+                                                <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
+                                            ) : <LoadingCircle message={'در حال بارگذاری'} size={32}/>
+                                }
                             </Select>
                             <FormHelperText error={groupPolicyError !== ''}>{groupPolicyError}</FormHelperText>
                         </FormControl>
@@ -225,17 +225,48 @@ function CreatePenaltyCondition() {
                         >
                         </TextField>
                     </Grid>
-
-                    <Grid xs={12} sm={6} md={4}>
-                        <LoadingButton
-                            loading={createPenaltyConditionLoading}
-                            type="submit"
-                            variant="contained"
-                            sx={{mt: 3, mb: 2}}
-                            fullWidth
-                            onClick={handleSubmit}
-                        >ایجاد
-                        </LoadingButton>
+                    <Grid sm={6} xs={12}>
+                        <FormControl fullWidth>
+                            <InputLabel id="penalty-type-label">نوع جریمه</InputLabel>
+                            <Select
+                                autoWidth
+                                labelId="penalty-type-label"
+                                value={penaltyType}
+                                onChange={(e) => setPenaltyType(e.target.value)}
+                                label="نوع جریمه"
+                            >
+                                <MenuItem value={'noPaid'}>{'مرخصی بدون حقوق'}</MenuItem>
+                                <MenuItem value={'paid'}>{'مرخصی استحقاقی'}</MenuItem>
+                            </Select>
+                            {
+                                penaltyType === 'paid' ?
+                                    <FormControlLabel
+                                        label={'جریمه کردن بدون حقوق در صورت نداشتن مرخصی باقیمانده'}
+                                        control={
+                                            <Checkbox
+                                                checked={penaltyIfNoLeaveRemains}
+                                                onChange={(e) => {
+                                                    setPenaltyIfNoLeaveRemains(e.target.checked)
+                                                }}
+                                            />}
+                                    >
+                                    </FormControlLabel>
+                                    : ''
+                            }
+                        </FormControl>
+                    </Grid>
+                    <Grid xs={12} container>
+                        <Grid xs={12} sm={6} md={4}>
+                            <LoadingButton
+                                loading={createPenaltyConditionLoading}
+                                type="submit"
+                                variant="contained"
+                                sx={{mt: 3, mb: 2}}
+                                fullWidth
+                                onClick={handleSubmit}
+                            >ایجاد
+                            </LoadingButton>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Container>

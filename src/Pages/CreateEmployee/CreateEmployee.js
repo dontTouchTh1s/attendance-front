@@ -1,13 +1,11 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 
 import {
     Box,
-    Button,
     Container,
     FormControl, FormHelperText,
     InputLabel,
     MenuItem,
-    Paper,
     Select, Snackbar,
     TextField,
     Typography
@@ -17,17 +15,20 @@ import Api from "../../Api";
 import UserContext from "../../Contexts/UserContext";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Alert} from "@mui/lab";
+import LoadingCircle from "../../Components/LoadingCircle";
+import useGroupPolicies from "../../Hooks/useGroupPolicies";
+import useEmployees from "../../Hooks/useEmployees";
 
 function CreatePenaltyCondition() {
+    const {groupPoliciesIsLoading, groupPoliciesError, groupPolicies} = useGroupPolicies();
+    const {employees, employeesError, employeesIsLoading} = useEmployees();
     const [firstName, setFirstName] = useState();
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [groupPolicy, setGroupPolicy] = useState('');
     const [manager, setManager] = useState('');
-    const [groupPolicies, setGroupPolicies] = useState([]);
-    const [employees, setEmployees] = useState([]);
-    const [roll, setRoll] = useState('employee');
+    const [role, setRole] = useState('employee');
 
     const [firstNameError, setFirstNameError] = useState('');
     const [lastNameError, setLastNameError] = useState('');
@@ -57,8 +58,8 @@ function CreatePenaltyCondition() {
             'manager_id': manager,
             'group_policy_id': groupPolicy
         };
-        if (roll !== '')
-            data.roll = roll;
+        if (role !== '')
+            data.role = role;
         try {
             setCreateEmployeeLoading(true);
             let response = await Api.post('/employees/create', data);
@@ -81,33 +82,6 @@ function CreatePenaltyCondition() {
 
         }
 
-    }
-
-    useEffect(() => {
-        fetchGroupPolicies();
-        fetchEmployees();
-    }, [])
-
-    async function fetchGroupPolicies() {
-        try {
-            const response = await Api.get('/group-policies');
-            // handle successful response
-            setGroupPolicies(response.data);
-
-        } catch (error) {
-
-        }
-    }
-
-    async function fetchEmployees() {
-        try {
-            const response = await Api.get('/employees');
-            // handle successful response
-            setEmployees(response.data.data);
-
-        } catch (error) {
-
-        }
     }
 
     function handleFormError() {
@@ -182,7 +156,7 @@ function CreatePenaltyCondition() {
     return (
         <Box>
             <Typography component="h1" variant="h4">
-                اضافه کردن کارمنده
+                اضافه کردن کارمند
             </Typography>
             <Typography component='p' sx={{marginTop: '8px'}}>
                 در این بخش میتوانید کارمند جدید به سامانه اضافه کنید. برای این کار سیاست کاری، و سرپرست مربوطه را مشخص
@@ -274,10 +248,18 @@ function CreatePenaltyCondition() {
                                 label="گروه سیاست کاری"
                                 required
                             >
-                                {groupPolicies.map(gp =>
-                                    <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
-                                )}
-
+                                {
+                                    groupPoliciesError ?
+                                        <Box sx={{py: 1, px: 2}}>
+                                            <Typography component={'span'} variant={'body1'} color={'red'}>
+                                                {'خطا در هنگام بارگیری!'}
+                                            </Typography>
+                                        </Box> :
+                                        !groupPoliciesIsLoading ?
+                                            groupPolicies.map(gp =>
+                                                <MenuItem key={gp.id} value={gp.id}>{gp.name}</MenuItem>
+                                            ) : <LoadingCircle message={'در حال بارگذاری'} size={32}/>
+                                }
                             </Select>
                             <FormHelperText error={groupPolicyError !== ''}>{groupPolicyError}</FormHelperText>
                         </FormControl>
@@ -292,24 +274,34 @@ function CreatePenaltyCondition() {
                                 onChange={(e) => setManager(e.target.value)}
                                 label="سرپرست"
                             >
-                                {employees.map(e =>
-                                    <MenuItem key={e.id} value={e.id}>{e.name}</MenuItem>
-                                )}
+                                {
+                                    employeesError ?
+                                        <Box sx={{py: 1, px: 2}}>
+                                            <Typography component={'span'} variant={'body1'} color={'red'}>
+                                                {'خطا در هنگام بارگیری!'}
+                                            </Typography>
+                                        </Box> :
+                                        !employeesIsLoading ?
+                                            employees.map(e =>
+                                                <MenuItem key={e.id} value={e.id}>{e.name}</MenuItem>
+                                            ) : <LoadingCircle message={'در حال بارگذاری'} size={32}/>
+                                }
                             </Select>
                             <FormHelperText>اختیاری</FormHelperText>
 
                         </FormControl>
                     </Grid>
+
                     {
-                        user.current.navBarUser.roll === 'superAdmin' ?
+                        user.current.mainDrawerUser.role === 'superAdmin' ?
                             <Grid sm={6} xs={12}>
                                 <FormControl fullWidth>
                                     <InputLabel id="roll-label">نقش</InputLabel>
                                     <Select
                                         autoWidth
                                         labelId="roll-label"
-                                        value={roll}
-                                        onChange={(e) => setRoll(e.target.value)}
+                                        value={role}
+                                        onChange={(e) => setRole(e.target.value)}
                                         label="نقش"
                                     >
                                         <MenuItem
@@ -322,16 +314,18 @@ function CreatePenaltyCondition() {
                     }
 
 
-                    <Grid xs={12} sm={6} md={4}>
-                        <LoadingButton
-                            loading={createEmployeeLoading}
-                            type="submit"
-                            variant="contained"
-                            sx={{mt: 3, mb: 2}}
-                            fullWidth
-                            onClick={handleSubmit}
-                        >ایجاد
-                        </LoadingButton>
+                    <Grid xs={12} container>
+                        <Grid xs={12} sm={6} md={4}>
+                            <LoadingButton
+                                loading={createEmployeeLoading}
+                                type="submit"
+                                variant="contained"
+                                sx={{mt: 3, mb: 2}}
+                                fullWidth
+                                onClick={handleSubmit}
+                            >ایجاد
+                            </LoadingButton>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Container>

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 
 import {
     Box,
-    Button,
     Container,
     FormControl, FormHelperText, InputAdornment,
     InputLabel,
@@ -150,7 +149,7 @@ function CreateGroupPolicy() {
                     ساخت سیاست کاری
                 </Typography>
                 <Typography component='p' sx={{marginTop: '8px'}}>
-                    در این بخش میتوانید سیاست کاری برای گروه های مختلف کارکنان ایجاد کنید.
+                    در این بخش می‌توانید سیاست کاری برای گروه های مختلف کارکنان ایجاد کنید.
                 </Typography>
                 <Container disableGutters maxWidth={'md'} sx={{p: {xs: 1, md: 2}}}>
                     <Grid container spacing={{xs: 2, md: 3}}>
