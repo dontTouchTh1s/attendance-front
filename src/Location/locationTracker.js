@@ -3,11 +3,11 @@ import moment from "moment-jalaali";
 
 export default function locationTracker(geoOptions) {
 
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(success, error, geoOptions);
-    } else {
-        console.log("Geolocation not supported");
-    }
+    // if (navigator.geolocation) {
+    //     navigator.geolocation.watchPosition(success, error, geoOptions);
+    // } else {
+    //     console.log("Geolocation not supported");
+    // }
 
     async function success(position) {
         const lat1 = localStorage.getItem('lat');
@@ -27,7 +27,6 @@ export default function locationTracker(geoOptions) {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         const d = R * c; // in metres
-
         if (d > radius) {
             // User is out of workplace
             console.log('is out');
@@ -37,7 +36,7 @@ export default function locationTracker(geoOptions) {
                     let data = new FormData();
                     data.append('date', moment().format('YYYY-MM-DD HH-mm-ss'))
                     data.append('type', 'leave');
-                    let response = await Api.post('attendance-leave/create', data);
+                    await Api.post('attendance-leave/create', data);
                     localStorage.setItem('employeeStatus', 'out');
                 } catch (error) {
 
@@ -51,7 +50,7 @@ export default function locationTracker(geoOptions) {
                     let data = new FormData();
                     data.append('date', moment().format('YYYY-MM-DD HH-mm-ss'))
                     data.append('type', 'attendance');
-                    let response = await Api.post('attendance-leave/create', data);
+                    await Api.post('attendance-leave/create', data);
                     localStorage.setItem('employeeStatus', 'in');
                 } catch (error) {
 
