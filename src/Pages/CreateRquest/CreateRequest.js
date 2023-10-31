@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 
 import {
     Box,
-    Button,
     Container,
     FormControl,
     InputLabel,
@@ -73,7 +72,6 @@ function CreateLeaveRequest() {
         } catch (error) {
             setCreateRequestLoading(false);
             if (error.response.status === 406) {
-                console.log(true);
                 setSnackbarOpen(true);
                 setSnackbarType('error');
                 setSnackbarMessage(error.response.data);
@@ -149,7 +147,7 @@ function CreateLeaveRequest() {
                             </FormControl>
                         </Grid>
                         <Grid xs={12} container spacing={{xs: 2, md: 3}}
-                              className={hourPickerDisplay + " form-control"}>
+                              className={hourPickerDisplay + " not-hidden"} sx={{maxHeight: 175}}>
                             <Grid xs={12}>
                                 <DatePicker
                                     sx={{width: '100%'}}
@@ -178,9 +176,9 @@ function CreateLeaveRequest() {
                                 />
                             </Grid>
                         </Grid>
-                        <Grid xs={12}>
+                        <Grid xs={12} className={dateRangePicker + " not-hidden"} sx={{maxHeight: 80}}>
                             <DateRangePicker
-                                className={dateRangePicker + " form-control"}
+
                                 localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
                                 value={dateRange}
                                 onChange={handleDateRangeChange}
