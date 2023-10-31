@@ -1,49 +1,70 @@
-import {useNavigate} from "react-router-dom";
-import {useContext, useEffect, useRef, useState} from "react";
+import {Await, defer, useLoaderData, useNavigate} from "react-router-dom";
+import {Suspense, useContext, useState} from "react";
 import Api from "../Api";
 import UserContext from "../Contexts/UserContext";
-import CurrentPageContext from "../Contexts/CurrentPageContext";
+import getCookie from "../Functions/GetCookie/GetCookie";
+import LoadingCircle from "./LoadingCircle";
 
-function ProtectedRoute({requiredRoll, children}) {
-    const navigate = useNavigate();
-    const user = useContext(UserContext);
-    const currentPage = useContext(CurrentPageContext);
-    const [checked, setChecked] = useState(false);
+export async function loader() {
 
-    async function getUser() {
+    if (getCookie('is_auth')) {
         try {
-            let response = await Api.get('/auth/');
-            console.log(response.data)
-            user.current.setNavBarUser(response.data);
-
-            setChecked(true);
-            if (requiredRoll !== undefined) {
-                if (!requiredRoll.includes(response.data.roll)) {
-                    currentPage.current.setNavBarCurrentPage('/panel');
-                    navigate('/panel');
-                }
-            }
+            let response = Api.get('/auth/');
+            return defer({currentUser: response});
         } catch (error) {
             if (error.response) {
-                // handle error response
                 if (error.response.status === 401) {
-                    currentPage.current.setNavBarCurrentPage('/login');
-                    user.current.setNavBarUser({});
-                    navigate('/login');
+                    return {currentUser: null};
                 }
             }
         }
+    } else {
+        return {currentUser: null};
+    }
+}
+
+function ProtectedRoute({requiredRole = 'guest', children}) {
+    const data = useLoaderData();
+    const navigate = useNavigate();
+    const user = useContext(UserContext);
+    const [auth, setAuth] = useState(false);
+
+
+    async function checkUser() {
+        let userData = await data.currentUser;
+        // userData.data = {role: 'managerAdministrativeAffairs'}
+        if (userData) {
+            user.current.setMainDrawerUser(userData.data);
+            if (requiredRole !== 'guest') {
+                if (userData.data) {
+                    if (!requiredRole.includes(userData.data.role)) {
+                        navigate('/panel');
+                    }
+                } else {
+                    navigate('/login');
+                }
+            }
+        } else {
+            navigate('/login');
+        }
+        setAuth(true);
     }
 
-    useEffect(() => {
-        getUser()
-    });
+    if (!auth) checkUser();
 
     return (
-
-
-        checked ? children : ''
-
+        <Suspense
+            fallback={<LoadingCircle height={'80vh'}/>}
+        >
+            <Await
+                resolve={data.currentUser}
+                errorElement={
+                    <p>Error loading package location!</p>
+                }
+                children={auth && children}
+            >
+            </Await>
+        </Suspense>
     );
 }
 

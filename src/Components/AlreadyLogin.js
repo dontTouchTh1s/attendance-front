@@ -1,34 +1,45 @@
-import {useNavigate} from "react-router-dom";
-import {useContext, useEffect, useState} from "react";
-import Api from "../Api";
-import CurrentPageContext from "../Contexts/CurrentPageContext";
+import {Await, useLoaderData, useNavigate} from "react-router-dom";
+import {Suspense, useContext, useState} from "react";
 import UserContext from "../Contexts/UserContext";
+import LoadingCircle from "./LoadingCircle";
 
 function AlreadyLogin({children}) {
     const navigate = useNavigate();
-    const currentPage = useContext(CurrentPageContext);
-    const [checked, setChecked] = useState(false);
     const user = useContext(UserContext);
-    useEffect(() => {
-        async function getUser() {
-            try {
-                let response = await Api.get('/auth/');
-                if (response.status === 200) {
-                    user.current.setNavBarUser(response.data);
-                    currentPage.current.setNavBarCurrentPage('/panel');
-                    navigate('/panel');
-                }
-                setChecked(true);
-            } catch (error) {
-                console.log('error');
-                setChecked(true);
-            }
-        }
+    const data = useLoaderData();
+    const [auth, setAuth] = useState(false);
 
-        getUser();
-    });
+    async function checkUser() {
+        const userData = await data.currentUser;
+        if (userData) {
+            user.current.setMainDrawerUser(userData.data);
+            if (userData.data) {
+                navigate('/panel');
+            } else {
+                user.current.setMainDrawerUser(null);
+            }
+        } else {
+            user.current.setMainDrawerUser(null);
+        }
+        setAuth(true);
+    }
+
+    if (!auth) checkUser();
+
+
     return (
-        checked ? children : ''
+        <Suspense
+            fallback={<LoadingCircle height={'80vh'}/>}
+        >
+            <Await
+                resolve={data.currentUser}
+                errorElement={
+                    <p>Error loading package location!</p>
+                }
+            >
+                {auth && children}
+            </Await>
+        </Suspense>
     )
 }
 
