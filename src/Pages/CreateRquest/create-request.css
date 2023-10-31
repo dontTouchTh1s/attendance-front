@@ -1,10 +1,11 @@
-.form-control {
-    transition: 350ms;
-    max-height: 1000px;
+.not-hidden {
+    transition: 550ms;
+    max-height: 103px;
+    overflow: hidden;
 }
 
 .hidden {
-    max-height: 0;
+    max-height: 0 !important;
+    padding: 0 12px !important;
     overflow: hidden;
-    visibility: hidden;
 }
