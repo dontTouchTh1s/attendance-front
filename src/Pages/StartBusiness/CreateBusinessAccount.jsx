@@ -4,9 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import React, {useState, useEffect, useRef, forwardRef, useImperativeHandle} from "react";
 import '../CreateRquest/create-request.css'
+import Guide from "../../Components/UserGuide/Guide";
 
 const CreateBusinessAccount = forwardRef((props, ref) => {
-    const {initialValues, onErrorChange, onChange} = props;
+    const {initialValues, onChange} = props;
     const [email, setEmail] = useState(initialValues.email);
     const [password, setPassword] = useState(initialValues.password);
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,6 +24,7 @@ const CreateBusinessAccount = forwardRef((props, ref) => {
 
     const [loginPage, setLoginPage] = useState(initialValues.login);
 
+    const guidesRef = useRef([]);
 
     useImperativeHandle(ref, () => ({
         checkErrors() {
@@ -110,15 +112,6 @@ const CreateBusinessAccount = forwardRef((props, ref) => {
         }
     }
 
-
-    function handleHaveAccount() {
-        setLoginPage(true);
-    }
-
-    function handleCreateAccount() {
-        setLoginPage(false);
-    }
-
     const hideOnLoginStyle = 'not-hidden ' + (loginPage ? 'hidden' : '');
     return (
         <>
@@ -128,13 +121,16 @@ const CreateBusinessAccount = forwardRef((props, ref) => {
             <Typography component='p' sx={{marginTop: '8px'}}>
                 در صورتی که قبلا حساب کاربری ساختید، میتوانید وارد آن شوید.
             </Typography>
-            <Container disableGutters sx={{py: {xs: 1, sm: 2}}} maxWidth={'xs'}>
+            <Container disableGutters sx={{py: {xs: 1, sm: 2}}}
+                       maxWidth={'xs'}>
+
                 <Typography component='h6' variant='h6' sx={{marginTop: '8px'}} textAlign={'center'}>
                     {loginPage ? 'ورود' : 'ساخت حساب'}
                 </Typography>
                 <Grid container spacing={{xs: 2, md: 3}} sx={{mt: 2}}>
                     <Grid xs={6} className={hideOnLoginStyle}>
                         <TextField
+                            ref={(el) => (guidesRef.current[0] = el)}
                             onBlur={(e) => handleFirstNameError(e.target.value)}
                             required
                             error={nameError !== ''}
@@ -153,6 +149,7 @@ const CreateBusinessAccount = forwardRef((props, ref) => {
                     </Grid>
                     <Grid xs={6} className={hideOnLoginStyle}>
                         <TextField
+                            ref={(el) => (guidesRef.current[1] = el)}
                             required
                             onBlur={(e) => handleLastNameError(e.target.value)}
                             error={lastNameError !== ''}
@@ -267,6 +264,21 @@ const CreateBusinessAccount = forwardRef((props, ref) => {
                     </Grid>
                 </Grid>
             </Container>
+            <Guide
+                refs={guidesRef}
+                guidesName={'cbaGuides'}>
+                {
+                    [
+                        <Typography key={0}>
+                            برای فلان کار کردن میتوانید فلان کار را بکنید1.
+                        </Typography>,
+                        <Typography key={1}>
+                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
+                        </Typography>,
+
+                    ]
+                }
+            </Guide>
         </>
     );
 })

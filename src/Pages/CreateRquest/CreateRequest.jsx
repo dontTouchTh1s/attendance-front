@@ -178,7 +178,6 @@ function CreateLeaveRequest() {
                         </Grid>
                         <Grid xs={12} className={dateRangePicker + " not-hidden"} sx={{maxHeight: 80}}>
                             <DateRangePicker
-
                                 localeText={{start: 'از تاریخ', end: 'تا تاریخ'}}
                                 value={dateRange}
                                 onChange={handleDateRangeChange}

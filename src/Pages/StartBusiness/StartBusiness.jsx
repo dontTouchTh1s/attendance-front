@@ -1,7 +1,6 @@
 import React, {useRef, useState} from "react";
 import {
     Box,
-    Button,
     Container,
     CssBaseline, Snackbar,
     Step,
@@ -62,7 +61,7 @@ function StartBusiness() {
     async function handleCreateAccount() {
         try {
             const {login, ...rest} = data.current;
-            const response = await Api.post('/auth/register', rest);
+            const response = await Api.post('/auth/register', {...rest, role: 'businessAdmin'});
             if (response.data.status === 409) {
                 setSnackbarState({
                     open: true,
@@ -148,11 +147,6 @@ function StartBusiness() {
         }
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         setSkipped(newSkipped);
-    };
-
-    const handleBack = () => {
-        setNextEnable(true);
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
     function businessDetails() {
