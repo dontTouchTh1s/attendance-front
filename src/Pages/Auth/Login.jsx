@@ -37,22 +37,19 @@ function Login() {
             setLoginLoading(false);
             if (response.status === 200) {
                 navigate('/panel');
-                // handle successful response
-                localStorage.setItem('name', response.data['name']);
-                localStorage.setItem('email', response.data['email']);
-                let location = JSON.parse(response.data['workPlace']['location']);
-                localStorage.setItem('lat', location['lat']);
-                localStorage.setItem('lng', location['lng']);
-                localStorage.setItem('radius', response.data['workPlace']['radius']);
+            } else {
+                setSnackbarOpen(true);
+                if (response.response.status === 401) {
+                    setSnackbarMessage('نام کاربری یا رمز عبور صحیح نمی باشد.');
+                } else {
+                    setSnackbarMessage('در هنگام دریافت اطلاعات مشکلی پیش آمده است.');
+                }
             }
         } catch (error) {
             setLoginLoading(false);
             setSnackbarOpen(true);
-            if (error.response.status === 401) {
-                setSnackbarMessage('نام کاربری یا رمز عبور صحیح نمی باشد.');
-            } else {
-                setSnackbarMessage('در هنگام دریافت اطلاعات مشکلی پیش آمده است.');
-            }
+            setSnackbarMessage('در هنگام دریافت اطلاعات مشکلی پیش آمده است.');
+
         }
     }
 
@@ -131,7 +128,7 @@ function Login() {
                             required
                             fullWidth
                             label="رمز عبور"
-                            type={showPassword ? 'test' : 'password'}
+                            type={showPassword ? 'text' : 'password'}
                             autoComplete="current-password"
                             value={password}
                             aria-required

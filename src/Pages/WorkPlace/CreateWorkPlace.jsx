@@ -1,10 +1,11 @@
 import GoogleMap from "../../Components/Map/GoogleMap";
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
 import Api from "../../Api";
 import {Box, Container, InputAdornment, Snackbar, TextField, Typography,} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Alert} from "@mui/lab";
+import Guide from "../../Components/UserGuide/Guide";
 
 const defaultLocation = {lat: 32.6539, lng: 51.6660};
 const defaultZoom = 10;
@@ -206,6 +207,28 @@ function CreateWorkPlace() {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
+            <Guide
+                poses={{right: '50%', top: '50%'}}
+                guidesName={'workPlaceGuide'}>
+                {
+                    [
+                        <Typography key={0}>
+                            اولین قدیم برای شروع مدیریت، مشخص کردن محل کار است، موقعیت محل کار را از نقشه انتخاب کنید و
+                            یک محل کار جدید اضافه کنید.
+                        </Typography>,
+                        <Typography key={1}>
+                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
+                        </Typography>,
+                        <Typography key={2}>
+                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
+                        </Typography>,
+                        <Typography key={3}>
+                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
+                        </Typography>,
+
+                    ]
+                }
+            </Guide>
         </Box>
     )
 }

@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import './focused-element.css';
 import {theme} from "../../Theme/rtl-theme";
 
-function Guide({refs, guidesName, children}) {
+function Guide({guidesName, children, refs = null, poses = null}) {
     const [open, setOpen] = useState(false);
     const [page, setPage] = useState(1);
     const [height, setHeight] = useState(0);
@@ -15,24 +15,28 @@ function Guide({refs, guidesName, children}) {
     useEffect(() => {
         const guideShow = Boolean(localStorage.getItem('guideShow') ?? true);
         const currentPage = parseInt(localStorage.getItem(guidesName) ?? 1);
+
         setPage(currentPage);
-        setOpen(guideShow && currentPage !== refs.current.length);
+        setOpen(guideShow && currentPage !== children.length);
 
-        setRects(refs.current.map(ref => ref.getBoundingClientRect()));
-        setHeight(refs.current[currentPage - 1].offsetHeight);
-
-        refs.current[currentPage - 1].style.zIndex = theme.zIndex.modal + 1;
-        refs.current[currentPage - 1].style.backgroundColor = 'white';
+        if (refs) {
+            setRects(refs.current.map(ref => ref.getBoundingClientRect()));
+            setHeight(refs.current[currentPage - 1].offsetHeight);
+            setHeight(0);
+            refs.current[currentPage - 1].style.zIndex = theme.zIndex.modal + 1;
+            refs.current[currentPage - 1].style.backgroundColor = 'white';
+        }
     }, [guidesName, refs]);
 
 
     function handleChange(e, value) {
-        refs.current[page - 1].style.zIndex = 'unset';
-        refs.current[page - 1].style.backgroundColor = 'inherit';
+        if (refs) {
+            refs.current[page - 1].style.zIndex = 'unset';
+            refs.current[page - 1].style.backgroundColor = 'inherit';
+            refs.current[value - 1].style.zIndex = theme.zIndex.modal + 1;
+            refs.current[value - 1].style.backgroundColor = 'white';
+        }
         setPage(value);
-        refs.current[value - 1].style.zIndex = theme.zIndex.modal + 1;
-        refs.current[value - 1].style.backgroundColor = 'white';
-
         if (value > localStorage.getItem(guidesName))
             localStorage.setItem(guidesName, value);
     }
@@ -43,9 +47,12 @@ function Guide({refs, guidesName, children}) {
     }
 
     const style = {
-        right: rects[page - 1] ? rects[page - 1].right : 0,
-        top: rects[page - 1] ? rects[page - 1].bottom : 0,
+        right: poses ? '50%' : rects[page - 1] ? rects[page - 1].right : 0,
+        top: poses ? '50%' : rects[page - 1] ? rects[page - 1].bottom : 0,
+        transform: 'translateY(-50%) translateX(50%)'
+
     }
+
     return (
         <>
             <Dialog
