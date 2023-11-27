@@ -14,10 +14,18 @@ function Guide({guidesName, children, refs = null, poses = null}) {
 
     useEffect(() => {
         const guideShow = Boolean(localStorage.getItem('guideShow') ?? true);
-        const currentPage = parseInt(localStorage.getItem(guidesName) ?? 1);
+        let currentPage = localStorage.getItem(guidesName);
+        if (currentPage) {
+            currentPage = parseInt(currentPage)
+            setOpen(guideShow && currentPage < children.length);
+        } else {
+            currentPage = 1;
+            localStorage.setItem(guidesName, 1)
+            setOpen(true);
+        }
 
         setPage(currentPage);
-        setOpen(guideShow && currentPage !== children.length);
+
 
         if (refs) {
             setRects(refs.current.map(ref => ref.getBoundingClientRect()));
