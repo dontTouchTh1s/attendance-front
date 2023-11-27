@@ -1,28 +1,30 @@
-import GoogleMap from "../../Components/Map/GoogleMap";
 import React, {useRef, useState} from 'react'
 import Api from "../../Api";
-import {Box, Container, InputAdornment, Snackbar, TextField, Typography,} from "@mui/material";
+import {Box, InputAdornment, Snackbar, TextField, Typography,} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {Alert} from "@mui/lab";
 import Guide from "../../Components/UserGuide/Guide";
+import Map from "../../Components/Map/Map";
 
 const defaultLocation = {lat: 32.6539, lng: 51.6660};
-const defaultZoom = 10;
 
 function CreateWorkPlace() {
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
     const [radius, setRadius] = useState(0);
-    const [location, setLocation] = useState(defaultLocation);
-    const [zoom, setZoom] = useState(defaultZoom);
+
     const [nameError, setNameError] = useState('');
     const [addressError, setAddressError] = useState('');
     const [radiusError, setRadiusError] = useState('');
     const [createWorkPlaceLoading, setCreateWorkPlaceLoading] = useState(false);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarType, setSnackbarType] = useState('error');
-    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarStatus, setSnackbarStatus] = useState({
+        open: false,
+        type: 'error',
+        message: ''
+    });
+
+    const location = useRef(defaultLocation);
 
     async function handleSubmitWorkPlace() {
         // Insert new work place to database
@@ -42,27 +44,22 @@ function CreateWorkPlace() {
             setCreateWorkPlaceLoading(false);
             console.log(response)
             if (response.status === 201) {
-                setSnackbarOpen(true);
-                setSnackbarType('success');
-                setSnackbarMessage('محل کار با موفقیت اضافه شد.');
+                setSnackbarStatus({
+                    open: true,
+                    type: 'success',
+                    message: 'محل کار با موفقیت اضافه شد.'
+                });
             }
             // handle successful response
         } catch (error) {
             setCreateWorkPlaceLoading(false);
-            setSnackbarOpen(true);
-            setSnackbarType('error');
-            setSnackbarMessage('در هنگام ثبت اطلاعات مشکلی پیش آمده است.');
+            setSnackbarStatus({
+                open: true,
+                type: 'error',
+                message: 'در هنگام ثبت اطلاعات مشکلی پیش آمده است.'
+            });
         }
 
-    }
-
-
-    function handleChangeLocation(lat, lng) {
-        setLocation({lat: lat, lng: lng});
-    }
-
-    function handleChangeZoom(newZoom) {
-        setZoom(newZoom);
     }
 
     function handleFormError() {
@@ -107,7 +104,7 @@ function CreateWorkPlace() {
     function handleSnackBarClose(e, reason) {
         if (reason === 'clickaway')
             return;
-        setSnackbarOpen(false);
+        setSnackbarStatus({...snackbarStatus, open: false});
     }
 
     return (
@@ -178,14 +175,7 @@ function CreateWorkPlace() {
                         </Box>
                     </Grid>
                     <Grid xs={12} md={7}>
-                        <GoogleMap
-                            defaultLocation={location}
-                            zoom={zoom}
-                            mapTypeId="roadmap"
-                            style={{height: '700px'}}
-                            onChangeLocation={handleChangeLocation}
-                            onChangeZoom={handleChangeZoom}
-                            apiKey='AIzaSyD07E1VvpsN_0FvsmKAj4nK9GnLq-9jtj8'/>
+                        <Map locationRef={location}/>
                     </Grid>
                     <Grid xs={12} md={5}>
                         <LoadingButton
@@ -200,11 +190,11 @@ function CreateWorkPlace() {
                 </Grid>
             </Box>
             <Snackbar
-                open={snackbarOpen}
+                open={snackbarStatus.open}
                 autoHideDuration={6000}
                 onClose={handleSnackBarClose}>
-                <Alert severity={snackbarType} sx={{width: '100%'}}>
-                    {snackbarMessage}
+                <Alert severity={snackbarStatus.type} sx={{width: '100%'}}>
+                    {snackbarStatus.message}
                 </Alert>
             </Snackbar>
             <Guide
@@ -216,16 +206,6 @@ function CreateWorkPlace() {
                             اولین قدیم برای شروع مدیریت، مشخص کردن محل کار است، موقعیت محل کار را از نقشه انتخاب کنید و
                             یک محل کار جدید اضافه کنید.
                         </Typography>,
-                        <Typography key={1}>
-                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
-                        </Typography>,
-                        <Typography key={2}>
-                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
-                        </Typography>,
-                        <Typography key={3}>
-                            برای فلان کار کردن میتوانید فلان کار را بکنید2.
-                        </Typography>,
-
                     ]
                 }
             </Guide>
